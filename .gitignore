@@ -1,0 +1,8 @@
+# IDE / 操作系统
+/.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# 过程性临时文件
+/.tmp/
