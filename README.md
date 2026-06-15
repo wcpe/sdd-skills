@@ -11,21 +11,18 @@
 
 ```
 sdd-skills/
-├── init-sdd-project/SKILL.md
-├── retrofit-to-sdd/SKILL.md
-└── templates/                 两个技能共用的模板
-    ├── claude-rules/          防漂移规则 → 装到目标项目 .claude/rules/
-    ├── claude-skills/         迭代工作流技能 → 装到 .claude/skills/
-    ├── docs/
-    │   ├── CONTRIBUTING.md     演进与维护指南（通用）
-    │   ├── adr/README.md       ADR 索引
-    │   ├── specs/              功能级规格约定 + 模板
-    │   └── _skeletons/         PRD/ARCHITECTURE/API/OPERATIONS/SECURITY/README/CHANGELOG/ADR 骨架
-    ├── github/                PR / Issue 模板
-    ├── gitignore-templates/   按技术栈选
-    ├── editorconfig.txt
-    ├── licenses/              MIT 等
-    └── VERSION
+├── init-sdd-project/
+│   ├── SKILL.md
+│   └── templates/          该技能自带的全套模板（随技能打包，自包含）
+│       ├── claude-rules/   防漂移规则 → 装到目标项目 .claude/rules/
+│       ├── claude-skills/  迭代工作流技能 → 装到 .claude/skills/
+│       ├── docs/           CONTRIBUTING · adr · specs · _skeletons 文档骨架
+│       ├── github/         PR / Issue 模板
+│       └── gitignore-templates/ · editorconfig.txt · licenses/ · VERSION
+├── retrofit-to-sdd/
+│   ├── SKILL.md
+│   └── templates/          同上（每个技能各自带一份，自包含）
+└── README.md
 ```
 
 ## SDD 三个粒度
@@ -48,5 +45,10 @@ sdd-skills/
 
 ## 安装
 
-两个技能**共用仓库根的 `templates/`**，技能内通过 `../templates/` 定位。安装时**整体使用本仓库**（克隆 / 放进你的 skills 来源目录），保持 `init-sdd-project/`、`retrofit-to-sdd/`、`templates/` 三者同级。若要单独安装某个技能，记得把 `templates/` 一并带到该技能目录的上一级。
+每个技能**自包含**（`SKILL.md` + 自带 `templates/`），可独立打包分发：
+
+- **打成 `.skill` 安装包**：在 skill-creator 目录下运行 `python -m scripts.package_skill <仓库路径>/init-sdd-project`，得到 `init-sdd-project.skill`；`retrofit-to-sdd` 同理。把 `.skill` 文件发给别人，在 Claude 里安装即可。
+- **直接拷目录**：把 `init-sdd-project/`（含 `templates/`）整个拷进 `~/.claude/skills/` 或某项目的 `.claude/skills/`。
+
+> 两个技能各自带一份相同的 `templates/`——这是 skill 自包含规范的代价（资源必须在技能目录内），换来可独立打包、单独安装。
 

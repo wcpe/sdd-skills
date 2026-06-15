@@ -1,0 +1,26 @@
+# Go 构建产物
+/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.out
+*.test
+
+# 依赖与覆盖率
+/vendor/
+coverage.out
+
+# IDE / 操作系统
+/.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# 过程性文档与临时文件（不入库）
+/.tmp/
+
+# 环境与密钥（不入库）
+.env

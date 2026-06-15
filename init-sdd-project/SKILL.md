@@ -14,7 +14,7 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 - **流程**：`.claude/rules`（防漂移红线）+ `.claude/skills`（迭代工作流：开发/修复/重构/回滚/发布/快照/热修/依赖/文档）。
 - **工程化**：`VERSION` + 发布渠道、分支模型 + PR/Issue 模板、运维/安全/许可、静态检查。
 
-模板在**本仓库根的 `templates/`**（相对本技能目录为 `../templates/`）。本技能的工作是：**问清项目 → 用模板生成"项目特定"的规格 → 原样安装"通用"的规则与技能 → 配好 git/版本/许可**。
+模板随本技能打包在 **`templates/`**（本技能目录下）。本技能的工作是：**问清项目 → 用模板生成"项目特定"的规格 → 原样安装"通用"的规则与技能 → 配好 git/版本/许可**。
 
 ## 强制流程
 
@@ -36,7 +36,7 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 
 ### 3. 原样安装通用治理（从 `templates/` 拷贝，仅替换占位符）
 - `templates/claude-rules/*` → `<project>/.claude/rules/`（comments / config-files / git-commit / doc-sync / decision-alignment / scope-discipline / testing-and-quality / static-analysis / README）。
-- `templates/claude-skills/*` → `<project>/.claude/skills/`（9 个迭代技能）。
+- `templates/claude-skills/<name>.md`（10 个迭代技能）→ 逐个写入 `<project>/.claude/skills/<name>/SKILL.md`（模板里是扁平 `<name>.md`，安装时还原成各自的 `<name>/SKILL.md`）。
 - `templates/docs/{CONTRIBUTING.md, adr/README.md, specs/README.md, specs/_template.md}` → `<project>/docs/`。
 - `templates/github/*` → `<project>/.github/`；`templates/editorconfig.txt` → `.editorconfig`；按栈选 `templates/gitignore-templates/<stack>.gitignore` → `.gitignore`。
 仅替换占位符：项目名、技术栈、提交 scope 例子、测试高风险区、P2/P3 能力、静态检查工具等。

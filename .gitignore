@@ -6,3 +6,7 @@ Thumbs.db
 
 # 过程性临时文件
 /.tmp/
+
+# 打包产物（.skill 安装包可由 package_skill 重新生成）
+*.skill
+/dist/
