@@ -1,6 +1,6 @@
 ---
-name: rollback-change
-description: 回滚 / 撤销某个功能、某次改动或某个版本时使用。当用户说"把 X 回滚 / 撤掉 / 还原到之前、这个功能先下掉、上个版本有问题回退"时触发。优先 git revert，先评估兼容影响，取代相关 ADR，同步文档。
+name: sdd-rollback-change
+description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。回滚 / 撤销某个功能、某次改动或某个版本时使用。当用户说"把 X 回滚 / 撤掉 / 还原到之前、这个功能先下掉、上个版本有问题回退"时触发。优先 git revert，先评估兼容影响，取代相关 ADR，同步文档。
 ---
 
 # 回滚改动

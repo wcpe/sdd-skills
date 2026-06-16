@@ -1,6 +1,6 @@
 ---
-name: hotfix
-description: 对已发布的生产版本做紧急修复并出补丁版时使用。当用户说"线上炸了/生产出问题要紧急修、出个 hotfix、紧急补丁、prod 事故"时触发。从发布 tag 切 hotfix 分支、最小修复、出补丁版、再回流 main。
+name: sdd-hotfix
+description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。对已发布的生产版本做紧急修复并出补丁版时使用。当用户说"线上炸了/生产出问题要紧急修、出个 hotfix、紧急补丁、prod 事故"时触发。从发布 tag 切 hotfix 分支、最小修复、出补丁版、再回流 main。
 ---
 
 # 紧急修复（Hotfix）
@@ -16,14 +16,14 @@ hotfix 面向**生产事故**：快速、最小、严控。从出问题的发布
 - 弄清根因范围。事故要快，但仍**先写复现测试**（哪怕精简），确认改对了。
 
 ### 2. 最小修复
-- 只改修复事故所必需的部分，**绝不夹带功能 / 重构**（其余照常走 `develop-feature` / `refactor-code`）。
+- 只改修复事故所必需的部分，**绝不夹带功能 / 重构**（其余照常走 `sdd-develop-feature` / `sdd-refactor-code`）。
 - 守 `architecture-invariants`（见该规则），别因赶时间破坏分层、违反技术约束或绕过既定边界。
 
 ### 3. 验证
 - 复现测试转通过 + 相关测试全绿 + 构建全部可交付物成功。
 
 ### 4. 出补丁版
-- `CHANGELOG.md` 记本次修复；按 `release-version` 流程出**修订版本**（patch +1，如 `v0.3.2`），打 tag。
+- `CHANGELOG.md` 记本次修复；按 `sdd-release-version` 流程出**修订版本**（patch +1，如 `v0.3.2`），打 tag。
 
 ### 5. 回流 main（关键）
 - 把 hotfix 合并 / cherry-pick 回 `main`，确保该修复不在下个版本丢失——否则下次发布会让这个 bug"复活"。

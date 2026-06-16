@@ -11,10 +11,10 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 
 - **项目级规格**：`PRD`(要什么) · `ARCHITECTURE`(怎么建) · `ADR`(为什么这么定) · `API`(契约)。
 - **功能级规格**：`docs/specs/<feature>.md`（非平凡功能开发前的工作规格）。
-- **流程**：`.claude/rules`（防漂移红线）+ `.claude/skills`（迭代工作流：开发/修复/重构/回滚/发布/快照/热修/依赖/文档）。
+- **流程**：`.claude/rules`（防漂移红线，装进项目）+ 全局 `sdd-*` 迭代技能（开发/修复/重构/回滚/发布/快照/热修/依赖/文档，装在 `~/.claude/skills/`，所有 SDD 项目共享、更新一次全项目生效）。
 - **工程化**：`VERSION` + 发布渠道、分支模型 + PR/Issue 模板、运维/安全/许可、静态检查。
 
-模板随本技能打包在 **`templates/`**（本技能目录下）。本技能的工作是：**问清项目 → 用模板生成"项目特定"的规格 → 原样安装"通用"的规则与技能 → 配好 git/版本/许可**。
+模板随本技能打包在 **`templates/`**（本技能目录下）。本技能的工作是：**问清项目 → 用模板生成"项目特定"的规格 → 安装"通用"的防漂移规则 → 校验全局 `sdd-*` 迭代技能已就位 → 配好 git/版本/许可**。
 
 ## 强制流程
 
@@ -36,7 +36,7 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 
 ### 3. 原样安装通用治理（从 `templates/` 拷贝，仅替换占位符）
 - `templates/claude-rules/*` → `<project>/.claude/rules/`（comments / config-files / git-commit / doc-sync / decision-alignment / scope-discipline / testing-and-quality / static-analysis / README）。
-- `templates/claude-skills/<name>.md`（10 个迭代技能）→ 逐个写入 `<project>/.claude/skills/<name>/SKILL.md`（模板里是扁平 `<name>.md`，安装时还原成各自的 `<name>/SKILL.md`）。
+- 迭代技能**不再拷进项目**：它们是**全局技能**——`sdd-develop-feature` / `sdd-fix-bug` / `sdd-refactor-code` / `sdd-rollback-change` / `sdd-hotfix` / `sdd-release-version` / `sdd-publish-snapshot` / `sdd-bump-dependencies` / `sdd-update-docs` / `sdd-reconcile-external-commits`，装在 `~/.claude/skills/`，所有 SDD 项目共享、更新一次全项目生效。确认它们已安装（缺则提示用户从 sdd-skills 仓库安装）；项目侧无需 `.claude/skills/`。
 - `templates/docs/{CONTRIBUTING.md, adr/README.md, specs/README.md, specs/_template.md}` → `<project>/docs/`。
 - `templates/github/*` → `<project>/.github/`；`templates/editorconfig.txt` → `.editorconfig`；按栈选 `templates/gitignore-templates/<stack>.gitignore` → `.gitignore`。
 仅替换占位符：项目名、技术栈、提交 scope 例子、测试高风险区、P2/P3 能力、静态检查工具等。
@@ -45,7 +45,7 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 - `git init`（若未初始化）；**不自动 push**。
 - 实施计划（里程碑）写进 `.tmp/实施计划.md`——**不入库**（`.gitignore` 已含 `/.tmp/`）。
 - 按 `git-commit` 规范做中文初始提交（用户确认后）。
-- 给用户"接下来"：填实施计划 → 用 `develop-feature` 等技能迭代。
+- 给用户"接下来"：填实施计划 → 用 `sdd-develop-feature` 等全局技能迭代。
 
 ## 原则
 - **简单优先 / 右尺寸**：按项目规模裁剪，别照搬不需要的重型件（小项目不必上 CI 全家桶/多环境）。
@@ -55,9 +55,9 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 ## 实战提示（固化测试反馈）
 
 - **`_skeletons/` 只是生成蓝本，不整目录拷进项目**。据它生成 `PRD / ARCHITECTURE / API / OPERATIONS / SECURITY / README / CHANGELOG`（都在 `_skeletons/` 有对应骨架）+ ADR；**额外**把 `_skeletons/ADR.md` 拷成 `docs/adr/_template.md`，供项目以后写新 ADR。
-- **占位符要扫干净**：`<...>` 散落在 `architecture-invariants` / `scope-discipline` / `testing-and-quality` / `git-commit`（scope 例子）/ `LICENSE`（年份·持有者）/ **`CONTRIBUTING`（`<各可交付物>` / `<各组件测试全绿>`，易漏）** / `release-version` / `publish-snapshot`。装完跑一遍 `grep -rn '<[^>]*>'` 自查。
+- **占位符要扫干净**：`<...>` 散落在 `architecture-invariants` / `scope-discipline` / `testing-and-quality` / `git-commit`（scope 例子）/ `LICENSE`（年份·持有者）/ **`CONTRIBUTING`（`<各可交付物>` / `<各组件测试全绿>`，易漏）**。装完跑一遍 `grep -rn '<[^>]*>'` 自查（迭代技能已全局化、不在项目内，不必扫）。
 - **填完 `architecture-invariants` 删掉模板自带的填写引导**（那是给你填的脚手，不该留在项目里）。
-- **右尺寸的可操作判据**：无 YAML 配置 → 可不装 `config-files.md`；单人 / 暂不用 CI → 把 `CONTRIBUTING §8` 与 `static-analysis` 的 CI 段改成"可选 / 如果用 CI"而非既定事实；无独立构建产物的解释型项目（Python 等）→ `release-version` / `publish-snapshot` 的"构建可交付物"改成"源码即交付物 + 测试"。
+- **右尺寸的可操作判据**：无 YAML 配置 → 可不装 `config-files.md`；单人 / 暂不用 CI → 把 `CONTRIBUTING §8` 与 `static-analysis` 的 CI 段改成"可选 / 如果用 CI"而非既定事实；无独立构建产物的解释型项目（Python 等）→ 在 `docs/OPERATIONS.md` / README 的构建章节写明"源码即交付物 + 测试"（全局 `sdd-release-version` / `sdd-publish-snapshot` 会从这里读构建 / 测试命令）。
 - **ADR 文件名用英文 slug**（如 `0002-sqlite-storage.md`），标题正文照中文规范。
 - **`.gitignore`**：选栈模板后，再按本项目运行期产物补忽略项（SQLite `.db`、日志、上传目录等）。
 

@@ -1,6 +1,6 @@
 ---
-name: bump-dependencies
-description: 升级 / 更新第三方依赖时使用。当用户说"升级依赖、更新某个库、bump 版本、有安全公告要更新"时触发。先读变更说明、按组件最小升级、跑测试确认无破坏。
+name: sdd-bump-dependencies
+description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。升级 / 更新第三方依赖时使用。当用户说"升级依赖、更新某个库、bump 版本、有安全公告要更新"时触发。先读变更说明、按组件最小升级、跑测试确认无破坏。
 ---
 
 # 升级依赖

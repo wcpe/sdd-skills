@@ -1,6 +1,6 @@
 ---
 name: retrofit-to-sdd
-description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开发）项目时使用。当用户说"给现有项目补上 SDD 治理、把这个老项目改成规格/文档驱动、逆向生成架构文档和 ADR、给祖传代码套上防漂移规则和迭代技能、让这个项目以后按 SDD 迭代"时触发。它不改业务代码，而是从现有代码反向提取架构、补齐 PRD/ARCHITECTURE/ADR/规则/技能。
+description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开发）项目时使用。当用户说"给现有项目补上 SDD 治理、把这个老项目改成规格/文档驱动、逆向生成架构文档和 ADR、给祖传代码套上防漂移规则和迭代技能、让这个项目以后按 SDD 迭代"时触发。它不改业务代码，而是从现有代码反向提取架构、补齐 PRD/ARCHITECTURE/ADR 与防漂移规则，并接入全局 SDD 迭代技能。
 ---
 
 # 逆向改造为 SDD 项目
@@ -27,19 +27,19 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 
 ### 3. 安装通用治理（从 `templates/` 拷贝，按本项目替换占位符）
 同 `init-sdd-project` 第 3 步：
-- `templates/claude-rules/*` → `.claude/rules/`；`templates/claude-skills/<name>.md` → 逐个还原成 `.claude/skills/<name>/SKILL.md`。
+- `templates/claude-rules/*` → `.claude/rules/`。迭代技能**不拷入项目**——它们是全局 `sdd-*` 技能（装在 `~/.claude/skills/`，所有 SDD 项目共享）；确认已安装即可，缺则提示用户从 sdd-skills 仓库装。
 - `templates/docs/{CONTRIBUTING, adr/README, specs/*}` → `docs/`；`templates/github/*`、`editorconfig.txt`、按栈选 `.gitignore`。
 - 补 `CHANGELOG.md` / `VERSION` / `SECURITY.md` / `docs/OPERATIONS.md` 骨架（据现状填）。
 - **`.gitignore` 已含 `/.tmp/` 等**——若项目已有 `.gitignore`，是合并不是覆盖。
 
 ### 4. 对齐与缺口（关键：别和现有代码打架）
 - 现有约定与模板规则冲突时，**以项目现状为准调整规则**（如代码用英文注释，就别硬塞"必须中文注释"；如已有分支模型，沿用它改 CONTRIBUTING）。
-- 把"现状与理想的差距 / 技术债"列成 `.tmp/` 待办（不入库），作为后续用 `develop-feature`/`refactor-code` 迭代的输入——**但不在本次改造里动代码**。
+- 把"现状与理想的差距 / 技术债"列成 `.tmp/` 待办（不入库），作为后续用 `sdd-develop-feature`/`sdd-refactor-code` 迭代的输入——**但不在本次改造里动代码**。
 
 ### 5. 收尾
 - **不自动 push**；中文提交（`docs: 引入 SDD 治理` / `chore: 落地 SDD 脚手架`）。
-- 给用户"接下来"：以后加功能/修复/重构走 `.claude/skills` 的技能，文档随代码同步（`doc-sync`）。
-- **逆向期间 / 之后若有绕过流程的提交进来**（队友直推、CI、合并、逆向窗口内的新 commit）→ 用 `reconcile-external-commits` 增量同步文档。
+- 给用户"接下来"：以后加功能/修复/重构走全局 `sdd-*` 技能（`sdd-develop-feature` 等），文档随代码同步（`doc-sync`）。
+- **逆向期间 / 之后若有绕过流程的提交进来**（队友直推、CI、合并、逆向窗口内的新 commit）→ 用 `sdd-reconcile-external-commits` 增量同步文档。
 
 ## 原则
 - 忠于现状优先于规整理想；右尺寸（小项目别套重型治理）；不动业务代码。
@@ -47,10 +47,10 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 ## 实战提示（固化测试反馈）
 
 - **`_skeletons/` 只是生成蓝本，不整目录拷入**；据它生成各文档 + 把 `_skeletons/ADR.md` 拷成 `docs/adr/_template.md` 供以后用。
-- **占位符扫干净**：装完 `grep -rn '<[^>]*>'` 自查（`CONTRIBUTING` 的 `<各可交付物>` / `<各组件测试全绿>`、`architecture-invariants` / `release-version` / `publish-snapshot` / `git-commit` / `LICENSE` 等都有）；填完 `architecture-invariants` 删掉模板自带的填写引导。
-- **逆向项目通常没发过版**：追认的已交付 FR 状态填 `已交付`（**不带版本号**），首次发版时由 `release-version` 回填 `@vX.Y.Z`。
+- **占位符扫干净**：装完 `grep -rn '<[^>]*>'` 自查（`CONTRIBUTING` 的 `<各可交付物>` / `<各组件测试全绿>`、`architecture-invariants` / `git-commit` / `LICENSE` 等都有；迭代技能已全局化、不在项目内，不必扫）；填完 `architecture-invariants` 删掉模板自带的填写引导。
+- **逆向项目通常没发过版**：追认的已交付 FR 状态填 `已交付`（**不带版本号**），首次发版时由 `sdd-release-version` 回填 `@vX.Y.Z`。
 - **CHANGELOG 不追溯逆向前的历史能力**：只记一条"引入 SDD 治理"并指向 PRD FR 表（现有能力已用 FR 的 `已交付` 标明），别为旧功能逐条补 changelog。
-- **右尺寸**：解释型 / 无构建产物项目 → 把 `release-version` / `publish-snapshot` / `CONTRIBUTING` 的"构建可交付物"软化为"源码即交付物 + 测试"；无 YAML 配置 → 可不装 `config-files.md`；现有约定与模板规则冲突时以**现状**为准。
+- **右尺寸**：解释型 / 无构建产物项目 → 在 `docs/OPERATIONS.md` / README 与 `CONTRIBUTING` 写明"源码即交付物 + 测试"（全局 `sdd-release-version` / `sdd-publish-snapshot` 从项目文档读构建 / 测试命令）；无 YAML 配置 → 可不装 `config-files.md`；现有约定与模板规则冲突时以**现状**为准。
 - **`.gitignore`**：合并不覆盖既有，并按本项目运行期产物（SQLite `.db`、日志、上传目录等）补忽略项。
 - **ADR 文件名用英文 slug**。
 
