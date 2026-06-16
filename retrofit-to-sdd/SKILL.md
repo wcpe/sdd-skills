@@ -44,5 +44,15 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 ## 原则
 - 忠于现状优先于规整理想；右尺寸（小项目别套重型治理）；不动业务代码。
 
+## 实战提示（固化测试反馈）
+
+- **`_skeletons/` 只是生成蓝本，不整目录拷入**；据它生成各文档 + 把 `_skeletons/ADR.md` 拷成 `docs/adr/_template.md` 供以后用。
+- **占位符扫干净**：装完 `grep -rn '<[^>]*>'` 自查（`CONTRIBUTING` 的 `<各可交付物>` / `<各组件测试全绿>`、`architecture-invariants` / `release-version` / `publish-snapshot` / `git-commit` / `LICENSE` 等都有）；填完 `architecture-invariants` 删掉模板自带的填写引导。
+- **逆向项目通常没发过版**：追认的已交付 FR 状态填 `已交付`（**不带版本号**），首次发版时由 `release-version` 回填 `@vX.Y.Z`。
+- **CHANGELOG 不追溯逆向前的历史能力**：只记一条"引入 SDD 治理"并指向 PRD FR 表（现有能力已用 FR 的 `已交付` 标明），别为旧功能逐条补 changelog。
+- **右尺寸**：解释型 / 无构建产物项目 → 把 `release-version` / `publish-snapshot` / `CONTRIBUTING` 的"构建可交付物"软化为"源码即交付物 + 测试"；无 YAML 配置 → 可不装 `config-files.md`；现有约定与模板规则冲突时以**现状**为准。
+- **`.gitignore`**：合并不覆盖既有，并按本项目运行期产物（SQLite `.db`、日志、上传目录等）补忽略项。
+- **ADR 文件名用英文 slug**。
+
 ## 红线
 逆向改造里顺手改 / 重构业务代码 · 文档写成"希望的样子"而非代码现状 · 给现状每个细节都写 ADR（滥用）· 强推与现有代码冲突的规则 · 覆盖而非合并已有 `.gitignore` · 自动 push。

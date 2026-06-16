@@ -52,5 +52,14 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 - 中文注释 / 日志 / 提交；文档即代码。
 - **稳态层只陈述既定事实**：别把"还没做/待落地"的过渡话写进规则/技能（当前状态写进 README）。
 
+## 实战提示（固化测试反馈）
+
+- **`_skeletons/` 只是生成蓝本，不整目录拷进项目**。据它生成 `PRD / ARCHITECTURE / API / OPERATIONS / SECURITY / README / CHANGELOG`（都在 `_skeletons/` 有对应骨架）+ ADR；**额外**把 `_skeletons/ADR.md` 拷成 `docs/adr/_template.md`，供项目以后写新 ADR。
+- **占位符要扫干净**：`<...>` 散落在 `architecture-invariants` / `scope-discipline` / `testing-and-quality` / `git-commit`（scope 例子）/ `LICENSE`（年份·持有者）/ **`CONTRIBUTING`（`<各可交付物>` / `<各组件测试全绿>`，易漏）** / `release-version` / `publish-snapshot`。装完跑一遍 `grep -rn '<[^>]*>'` 自查。
+- **填完 `architecture-invariants` 删掉模板自带的填写引导**（那是给你填的脚手，不该留在项目里）。
+- **右尺寸的可操作判据**：无 YAML 配置 → 可不装 `config-files.md`；单人 / 暂不用 CI → 把 `CONTRIBUTING §8` 与 `static-analysis` 的 CI 段改成"可选 / 如果用 CI"而非既定事实；无独立构建产物的解释型项目（Python 等）→ `release-version` / `publish-snapshot` 的"构建可交付物"改成"源码即交付物 + 测试"。
+- **ADR 文件名用英文 slug**（如 `0002-sqlite-storage.md`），标题正文照中文规范。
+- **`.gitignore`**：选栈模板后，再按本项目运行期产物补忽略项（SQLite `.db`、日志、上传目录等）。
+
 ## 红线
 把模板里别项目的具体决策原样当本项目不变量 · 生成的 PRD/ARCHITECTURE 与访谈不符就交付 · 给项目每个小决定都写 ADR（滥用）· 自动 push · 把过渡性"未落地"措辞写进规则。
