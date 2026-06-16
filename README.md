@@ -1,6 +1,6 @@
 # SDD Skills
 
-一套「规格驱动开发（SDD, Spec-Driven Development）」的 AI 编码技能集：**2 个脚手架技能** + **12 个 `sdd-*` 迭代技能** + 一套可复用模板。同一套 `SKILL.md` 通用于 **Claude Code**（插件一键装全部）、**OpenAI Codex** 与 **opencode**。让项目**规格先行、文档即代码、跨会话不漂移**。沉淀自实战项目的治理实践。
+一套「规格驱动开发（SDD, Spec-Driven Development）」的 AI 编码技能集：**2 个脚手架技能** + **13 个 `sdd-*` 迭代技能** + 一套可复用模板。同一套 `SKILL.md` 通用于 **Claude Code**（插件一键装全部）、**OpenAI Codex** 与 **opencode**。让项目**规格先行、文档即代码、跨会话不漂移**。沉淀自实战项目的治理实践。
 
 ## 脚手架技能（一次性套上 SDD）
 
@@ -24,6 +24,7 @@
 | `sdd-update-docs` | 纯文档任务（PRD/ARCH/ADR…） |
 | `sdd-reconcile-external-commits` | 同步绕过流程的提交到文档 |
 | `sdd-accept-phase` | 整期 / 里程碑验收 · 发版就绪审计 |
+| `sdd-realign-prd` | PRD 结构 / 状态不合规时的诊断 + 工单（不亲自改） |
 | `sdd-sync-governance` | 把上游治理模板同步进现有项目 |
 
 > 这些技能只引用项目内的相对路径（`docs/PRD.md`、`.claude/rules/*` 等），装在哪都按"当前项目"解析——所以可全局共享，且更新时无需逐项目同步。（`sdd-sync-governance` 例外：它还要读插件自带的权威模板与项目对账，正是用来弥补"模板拷进项目后不随插件更新"这一缺口。）
@@ -48,13 +49,14 @@ sdd-skills/                         ← 仓库根 = 插件 = marketplace
 │   ├── sdd-fix-bug/SKILL.md               │
 │   ├── sdd-refactor-code/SKILL.md         │
 │   ├── sdd-rollback-change/SKILL.md       │
-│   ├── sdd-hotfix/SKILL.md                │ 12 个 sdd-* 迭代技能
+│   ├── sdd-hotfix/SKILL.md                │ 13 个 sdd-* 迭代技能
 │   ├── sdd-release-version/SKILL.md       │ （纯流程、无附带资源）
 │   ├── sdd-publish-snapshot/SKILL.md      │
 │   ├── sdd-bump-dependencies/SKILL.md     │
 │   ├── sdd-update-docs/SKILL.md           │
 │   ├── sdd-reconcile-external-commits/SKILL.md │
 │   ├── sdd-accept-phase/SKILL.md          │
+│   ├── sdd-realign-prd/SKILL.md           │
 │   └── sdd-sync-governance/SKILL.md        ┘
 └── README.md
 ```
@@ -223,6 +225,15 @@ sdd-skills/                         ← 仓库根 = 插件 = marketplace
    给人试用 ────────────► sdd-publish-snapshot（main 自动出快照）
    生产事故 ────────────► sdd-hotfix（从发布 tag 切补丁版，回流 main）
    上游模板更新到项目 ──► sdd-sync-governance（治理基线刷新）
+   方向变了 / 决策推翻 ─► sdd-update-docs（改 PRD §7 主题 / 计划 FR
+                            + 写新 ADR 取代旧 ADR）
+                          + sdd-rollback-change（如要下线已交付能力）
+                          → 改完回主循环，用 sdd-develop-feature 按新方向开干
+                          ※ 详见下方「方向变了 / 决策推翻 怎么改」
+   PRD 不规范 / 结构错位 ► sdd-realign-prd（诊断 + 出工单，不亲自改）
+                          → 工单按路由走 sdd-update-docs / sdd-fix-bug
+                          → 清零后 sdd-accept-phase 复核基于规范 PRD 的状态
+                          ※ 详见下方「PRD 不规范 / 结构错位 怎么纠正」
 ```
 
 **几条关键约束**（沉淀自实战，已写进对应技能的红线）：
@@ -242,6 +253,26 @@ sdd-skills/                         ← 仓库根 = 插件 = marketplace
 - 在 PRD §7 维护，**每期只写"主题/目标"**（例：P1=MVP / P2=治理增强 / P3=规模化），不在这里列 FR 编号——具体哪个 FR 属于哪期由 §4 表的"期"列说了算。
 - **什么时候加新期**：开新"大主题"才加。期数总数很少（成熟产品通常 3~6 个）；**产品成熟后（1.0 后稳态迭代）不再加新期**，改按版本（CHANGELOG/tag）+ 功能（FR/specs）组织。
 - **滥用信号**：期数往二十、上百涨 = 把"期"当成版本/功能在用了，停下来反思。
+
+#### 期号怎么命名（字面形式自由，性质比字面重要）
+
+SDD 只约束"期"的**概念性质**（粗粒度横轴 / 数量少 / 几乎不动 / 主题驱动），**不规定字面命名**。下面这些都合规，挑一种、在 PRD §7 顶部写明、全项目一致即可：
+
+| 命名风格 | 例 | 适合 |
+|---|---|---|
+| **优先级简写**（模板默认） | `P1` `P2` `P3` | 多数项目；表格短、有顺序 ⭐ |
+| Phase 全词 | `Phase 1` `Phase 2` | 对外 / 给非技术看 |
+| 里程碑词 | `MVP` `Beta` `GA` `Scale-out` | 整路线图已想清的产品 |
+| 代号 | `Athena` `Bravo` `Charlie` | 大型 / 跨团队 / 对外 |
+| 中文 | `一期` `二期` | 全中文文档项目 |
+
+**模板默认 `P1` 起、不用 `P0`**：因为 `P0` 在传统优先级语义里 = "最紧急"，跟"第零期"打架；留 `P0` 给"立项前 PoC / 探索"（不入 PRD，放 `.tmp/`）。团队习惯 P0 起也行——在 PRD §7 写明 `P0 = MVP / P1 = ...`，全项目用同一套。
+
+**别这么干**：
+- ❌ 一会儿 `P0` 一会儿 `P1` —— 挑一种
+- ❌ `phase01` 零填充（`phase01 → phase10` 跨位丑，你不会真到 10 期）
+- ❌ 同时用 P1 当"期号"又当"优先级"造成歧义
+- ❌ 中途换命名风格 —— 改一次终身，要换走 `sdd-update-docs`（PRD §7 说明 + §4 FR 表"期"列全部一致替换）
 
 ### 版本（SemVer）—— 唯一来源 = 根 `VERSION` 文件
 
@@ -299,6 +330,110 @@ sdd-skills/                         ← 仓库根 = 插件 = marketplace
 
 > 谁常动 / 谁不动：🔥 高频 = CHANGELOG（几乎每次）、PRD FR 表（每个 feat 加行 / 发版翻状态）、VERSION（每次发版）；❄ 低频 = ADR（只在架构决策时 +1 或取代）；🧊 几乎不动 = **期数**（只在开新大阶段，罕见）、`.claude/rules` / `sdd-*` 技能（动它 = 动根基，要配 ADR）。
 
+### 方向变了 / 决策推翻 怎么改
+
+PRD 是**活路线图**，立项时定的期/FR/架构允许事后改——这是常态，不是错。SDD 不阻止改方向，只要求**改的痕迹可追溯**：不删历史、不偷改 ADR、不靠堆期号扛改动。
+
+分两种情况：
+
+**情况 1：未交付的期 / FR 方向不对（最常见，最简单）**
+
+```
+ 你：「P2 方向不对，改成 ...」/「FR-9 不要了，换成 FR-9'」
+        ↓
+ sdd-update-docs
+   · 改 PRD §7 P2 / P3 主题描述（本来就几行字，活文档）
+   · 改 §4 FR 表里状态还是「计划」的行：删 / 改 / 加 / 调整归属期
+        ↓
+ 改完回主循环 ─► sdd-develop-feature 按新方向开第一个 FR
+```
+
+未动过的东西没历史包袱，跟改普通文档一样自由。
+
+**情况 2：已交付的 P1（或某个 FR）整个被推翻**
+
+```
+ 你：「v0.1.0 那条架构路全错了，要换成 ...」
+        ↓
+ ① sdd-update-docs 写新 ADR 取代旧 ADR
+      · 新 ADR 编号 = 现有最大 +1
+      · 旧 ADR 决策正文一字不改，只在状态行加「已被 ADR-NNNN 取代」+ 链接
+        ↓
+ ② sdd-rollback-change（如已交付能力要下线 / 替换）
+      · git revert 不删历史
+      · PRD §4 已交付 FR 行保留，状态后加备注
+        「已交付@v0.1.0（后被 ADR-NNNN 取代）」
+      · CHANGELOG 未发布段记「移除 / 回退 X，原因见 ADR-NNNN」
+        ↓
+ ③ 回主循环 ─► sdd-develop-feature 按新方向开发；下次 sdd-release-version
+   出新版本（按 SemVer，破坏性变更 → MAJOR +1 或 0.x 期 MINOR +1）
+```
+
+**不允许的事**（任何情况下都别做）：
+
+| ❌ 不能做 | ✅ 正确做法 |
+|---|---|
+| 删 PRD §4 已交付的 FR 行 | 保留，状态后加备注「后被 ADR-NNNN 取代」 |
+| 改已接受 ADR 的决策正文 | 写新 ADR 取代，旧 ADR 只改状态行 + 链接 |
+| 加 P4 / P5 / P6… 去扛"拨乱反正" | 期数几乎不动；改的是期装的内容，不是堆新期号 |
+| 在一次会话里又改文档又改业务代码 | 职责分清：`sdd-update-docs` 改文档、`sdd-rollback-change` 改代码、`sdd-develop-feature` 按新方向开发 |
+
+> **为什么这么"啰嗦"**：是为了让"我们曾经这么想过、后来这么改了"成为可追溯事实，不是被悄悄抹掉。半年后有人问"为什么用 X 不用 Y"，答案就在 ADR 链里——而不是"以前试过 Y，但代码看不到了，也没人记得"。**错过的决策也是资产。**
+
+### PRD 不规范 / 结构错位 怎么纠正
+
+上一小节讲的是"想改方向"——主动调整未交付的 PRD 内容。这一小节讲的是另一种情况：**PRD 已经存在，但写法本身就不符合 SDD 规范**——期号 / 优先级 / 版本三套混用、FR 编号重复或跳号、一堆 ✅ done 但验收清单半空（误标 done）、缺 §6 整期验收 / §7 分期主题、bug 记录混进了 PRD……这种 PRD 不能直接拿去 `sdd-accept-phase` 验收，结果会是"看似全过"的假结论。
+
+**先 realign 再 accept-phase 再 release-version**，顺序不能反。
+
+**八类常见症状**：
+
+| # | 症状 | 等级 |
+|---|---|---|
+| 1 | 期号大节 + 每个 FR 的"优先级"字段 + V1/V2 版本分组 三套体系叠加 | ❗ 阻断 |
+| 2 | 期号命名内部不一致（P0 / P1 混用、零填充、中途换风格、期号当版本用） | ❗ 阻断 |
+| 3 | FR 编号重复（如两个 FR-017）或跳号（FR-100~106） | ❗ 阻断 |
+| 4 | ✅ done 但验收清单半空、状态枚举里有 deprecated / deferred 但从没用过 | ❗ 阻断 |
+| 5 | 没有 §7 分期主题（只有期号标签，没说每期"做什么主题"） | ❗ 阻断 |
+| 6 | 没有 §6 整期验收（验收只散在每个 FR 下，sdd-accept-phase 扫不到） | 🟡 严重 |
+| 7 | PRD 里混了 bug 记录 / 实施任务 / 过程性笔记 | 🟡 严重 |
+| 8 | 死字段、过期链接、关联 ADR 已被取代未更新 | 🟢 提示 |
+
+**操作流**：
+
+```
+ 你：「PRD 不规范，整理一下 / 帮我审一下 PRD 是否合规」
+        ↓
+ ① sdd-realign-prd（诊断 + 工单，不亲自改）
+    扫八类症状 → 产出 .tmp/prd-realign-<日期>.md：
+      · 结论速览（符合 / 部分 / 不符合）
+      · 逐项诊断（现状 + 目标 + 走哪个技能）
+      · 工单清单（按 ❗ / 🟡 / 🟢 排序，checkbox 可勾）
+        ↓
+ ② 按工单逐项执行（在另一个会话里，每项一个 commit）：
+    · sdd-fix-bug  →  误标 done 的 FR 状态归真（最先做，先归真再排期）
+    · sdd-update-docs →  FR 编号、期 / 优先级 / 版本错位、§6 §7 补全、
+                          移除 bug 记录、死字段清理
+    · sdd-rollback-change  →  如有"被取代的已交付能力"要真下线
+        ↓
+ ③ sdd-accept-phase（基于已规范化的 PRD 复核）
+    出新的验收报告，对比修前修后；若仍有差距回 ② 补完
+        ↓
+ ④ 全过 → sdd-release-version 发版；进下一期
+```
+
+**关键顺序**：**先归真状态，再整理结构**——状态决定哪些 FR 现状是 done / in-progress / todo，直接影响 §7 分期归属与 §6 验收策略。先把假 done 翻回去，再排期补 §6，顺序反了会把"待修"FR 当成"已交付"分到旧期。
+
+**别这么干**：
+
+| ❌ 不能做 | ✅ 正确做法 |
+|---|---|
+| `sdd-realign-prd` 自己批量改 PRD | 它只产工单 + 路由，执行交 `sdd-update-docs` / `sdd-fix-bug` |
+| 没归真就重整分期 | 先 `sdd-fix-bug` 把误标 done 的 FR 翻回 `开发中`，再排期 |
+| 用新增期号扛改动（P4 = "拨乱反正" / P5 = "重做"） | 期数几乎不动；改的是期装的内容，不是堆新期号 |
+| 一个 commit 装完所有修整 | 一项一 commit（`docs(prd): FR 编号去重` / `fix(...): FR-X 状态归真` …），可追溯 |
+| 跳过 realign 直接 `sdd-accept-phase` | 不可信的 PRD 当基准会得出假结论，先 realign 再 accept-phase |
+
 ## 用法
 
 **先安装本技能集**（见下「安装」，Claude Code / Codex / opencode 三选一），之后在**目标项目**的会话里说出意图即可触发：
@@ -312,7 +447,7 @@ sdd-skills/                         ← 仓库根 = 插件 = marketplace
 
 同一套 `skills/`，三种工具都能用。仓库地址：`https://github.com/wcpe/sdd-skills`。
 
-### Claude Code（插件，一键装全部 14 个）
+### Claude Code（插件，一键装全部 15 个）
 
 本仓库自身即 marketplace，装后默认 **User 作用域**（所有项目可用）：
 
