@@ -1,6 +1,6 @@
 # SDD Skills
 
-一套「规格驱动开发（SDD, Spec-Driven Development）」的 AI 编码技能集：**2 个脚手架技能** + **10 个 `sdd-*` 迭代技能** + 一套可复用模板。同一套 `SKILL.md` 通用于 **Claude Code**（插件一键装全部）、**OpenAI Codex** 与 **opencode**。让项目**规格先行、文档即代码、跨会话不漂移**。沉淀自实战项目的治理实践。
+一套「规格驱动开发（SDD, Spec-Driven Development）」的 AI 编码技能集：**2 个脚手架技能** + **11 个 `sdd-*` 迭代技能** + 一套可复用模板。同一套 `SKILL.md` 通用于 **Claude Code**（插件一键装全部）、**OpenAI Codex** 与 **opencode**。让项目**规格先行、文档即代码、跨会话不漂移**。沉淀自实战项目的治理实践。
 
 ## 脚手架技能（一次性套上 SDD）
 
@@ -23,8 +23,9 @@
 | `sdd-bump-dependencies` | 升级第三方依赖 |
 | `sdd-update-docs` | 纯文档任务（PRD/ARCH/ADR…） |
 | `sdd-reconcile-external-commits` | 同步绕过流程的提交到文档 |
+| `sdd-sync-governance` | 把上游治理模板同步进现有项目 |
 
-> 这些技能只引用项目内的相对路径（`docs/PRD.md`、`.claude/rules/*` 等），装在哪都按"当前项目"解析——所以可全局共享，且更新时无需逐项目同步。
+> 这些技能只引用项目内的相对路径（`docs/PRD.md`、`.claude/rules/*` 等），装在哪都按"当前项目"解析——所以可全局共享，且更新时无需逐项目同步。（`sdd-sync-governance` 例外：它还要读插件自带的权威模板与项目对账，正是用来弥补"模板拷进项目后不随插件更新"这一缺口。）
 
 ## 仓库结构
 
@@ -46,12 +47,13 @@ sdd-skills/                         ← 仓库根 = 插件 = marketplace
 │   ├── sdd-fix-bug/SKILL.md               │
 │   ├── sdd-refactor-code/SKILL.md         │
 │   ├── sdd-rollback-change/SKILL.md       │
-│   ├── sdd-hotfix/SKILL.md                │ 10 个 sdd-* 迭代技能
+│   ├── sdd-hotfix/SKILL.md                │ 11 个 sdd-* 迭代技能
 │   ├── sdd-release-version/SKILL.md       │ （纯流程、无附带资源）
 │   ├── sdd-publish-snapshot/SKILL.md      │
 │   ├── sdd-bump-dependencies/SKILL.md     │
 │   ├── sdd-update-docs/SKILL.md           │
-│   └── sdd-reconcile-external-commits/SKILL.md ┘
+│   ├── sdd-reconcile-external-commits/SKILL.md │
+│   └── sdd-sync-governance/SKILL.md        ┘
 └── README.md
 ```
 
@@ -78,7 +80,7 @@ sdd-skills/                         ← 仓库根 = 插件 = marketplace
 
 同一套 `skills/`，三种工具都能用。仓库地址：`https://github.com/wcpe/sdd-skills`。
 
-### Claude Code（插件，一键装全部 12 个）
+### Claude Code（插件，一键装全部 13 个）
 
 本仓库自身即 marketplace，装后默认 **User 作用域**（所有项目可用）：
 

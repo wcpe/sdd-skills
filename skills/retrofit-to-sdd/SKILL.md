@@ -31,6 +31,7 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 - `templates/docs/{CONTRIBUTING, adr/README, specs/*}` → `docs/`；`templates/github/*`、`editorconfig.txt`、按栈选 `.gitignore`。
 - 补 `CHANGELOG.md` / `VERSION` / `SECURITY.md` / `docs/OPERATIONS.md` 骨架（据现状填）。
 - **`.gitignore` 已含 `/.tmp/` 等**——若项目已有 `.gitignore`，是合并不是覆盖。
+- 写 `.claude/rules/.sdd-version` 记来源戳（当前 sdd-skills 版本，读 `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` 的 `version`，是 git 检出再附 `commit`）+ 日期 + 来源技能，供 `sdd-sync-governance` 日后增量升级治理用。
 
 ### 4. 对齐与缺口（关键：别和现有代码打架）
 - 现有约定与模板规则冲突时，**以项目现状为准调整规则**（如代码用英文注释，就别硬塞"必须中文注释"；如已有分支模型，沿用它改 CONTRIBUTING）。

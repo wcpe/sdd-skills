@@ -1,7 +1,7 @@
 {
   "name": "sdd-skills",
-  "version": "0.1.0",
-  "description": "规格驱动开发（SDD）技能集：init-sdd-project / retrofit-to-sdd 两个脚手架技能，外加 10 个 sdd-* 迭代工作流技能（开发/修复/重构/回滚/发布/快照/热修/依赖/文档/同步外部提交），让项目规格先行、文档即代码、跨会话不漂移。",
+  "version": "0.2.0",
+  "description": "规格驱动开发（SDD）技能集：init-sdd-project / retrofit-to-sdd 两个脚手架技能，外加 11 个 sdd-* 迭代工作流技能（开发/修复/重构/回滚/发布/快照/热修/依赖/文档/同步外部提交/治理同步），让项目规格先行、文档即代码、跨会话不漂移。",
   "author": {
     "name": "wcpe"
   },
