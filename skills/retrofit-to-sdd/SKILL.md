@@ -9,7 +9,7 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 
 **不动业务代码、不改行为。** 逆向改造只**新增治理文档/规则/技能**，从既有代码反向提取"现状真相"，让以后的迭代有规可循。第一版文档要**忠于代码现状**，不是"你希望它变成的样子"——理想与现状的差距记成待办，不在这次顺手改。
 
-模板随本技能打包在 **`templates/`**（本技能目录下）。
+模板在本技能目录的 **`templates/`** 下（插件安装后其绝对路径为 `${CLAUDE_PLUGIN_ROOT}/skills/retrofit-to-sdd/templates/`；下文 `templates/` 均指此处）。
 
 ## 强制流程
 
@@ -27,7 +27,7 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 
 ### 3. 安装通用治理（从 `templates/` 拷贝，按本项目替换占位符）
 同 `init-sdd-project` 第 3 步：
-- `templates/claude-rules/*` → `.claude/rules/`。迭代技能**不拷入项目**——它们是全局 `sdd-*` 技能（装在 `~/.claude/skills/`，所有 SDD 项目共享）；确认已安装即可，缺则提示用户从 sdd-skills 仓库装。
+- `templates/claude-rules/*` → `.claude/rules/`。迭代技能**不拷入项目**——`sdd-*` 技能随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装。
 - `templates/docs/{CONTRIBUTING, adr/README, specs/*}` → `docs/`；`templates/github/*`、`editorconfig.txt`、按栈选 `.gitignore`。
 - 补 `CHANGELOG.md` / `VERSION` / `SECURITY.md` / `docs/OPERATIONS.md` 骨架（据现状填）。
 - **`.gitignore` 已含 `/.tmp/` 等**——若项目已有 `.gitignore`，是合并不是覆盖。

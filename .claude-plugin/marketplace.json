@@ -1,0 +1,13 @@
+{
+  "name": "sdd-skills",
+  "owner": {
+    "name": "wcpe"
+  },
+  "plugins": [
+    {
+      "name": "sdd-skills",
+      "source": "./",
+      "description": "规格驱动开发（SDD）技能集：2 个脚手架技能 + 10 个全局迭代技能。"
+    }
+  ]
+}

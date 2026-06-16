@@ -11,10 +11,10 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 
 - **项目级规格**：`PRD`(要什么) · `ARCHITECTURE`(怎么建) · `ADR`(为什么这么定) · `API`(契约)。
 - **功能级规格**：`docs/specs/<feature>.md`（非平凡功能开发前的工作规格）。
-- **流程**：`.claude/rules`（防漂移红线，装进项目）+ 全局 `sdd-*` 迭代技能（开发/修复/重构/回滚/发布/快照/热修/依赖/文档，装在 `~/.claude/skills/`，所有 SDD 项目共享、更新一次全项目生效）。
+- **流程**：`.claude/rules`（防漂移红线，装进项目）+ `sdd-*` 迭代技能（开发/修复/重构/回滚/发布/快照/热修/依赖/文档，随本 `sdd-skills` 插件一同提供，所有 SDD 项目共享、`/plugin update` 一次更新全项目生效）。
 - **工程化**：`VERSION` + 发布渠道、分支模型 + PR/Issue 模板、运维/安全/许可、静态检查。
 
-模板随本技能打包在 **`templates/`**（本技能目录下）。本技能的工作是：**问清项目 → 用模板生成"项目特定"的规格 → 安装"通用"的防漂移规则 → 校验全局 `sdd-*` 迭代技能已就位 → 配好 git/版本/许可**。
+模板在本技能目录的 **`templates/`** 下（插件安装后其绝对路径为 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/`；下文 `templates/` 均指此处）。本技能的工作是：**问清项目 → 用模板生成"项目特定"的规格 → 安装"通用"的防漂移规则 → 配好 git/版本/许可**（`sdd-*` 迭代技能随本插件一同提供，无需单独安装）。
 
 ## 强制流程
 
@@ -36,7 +36,7 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 
 ### 3. 原样安装通用治理（从 `templates/` 拷贝，仅替换占位符）
 - `templates/claude-rules/*` → `<project>/.claude/rules/`（comments / config-files / git-commit / doc-sync / decision-alignment / scope-discipline / testing-and-quality / static-analysis / README）。
-- 迭代技能**不再拷进项目**：它们是**全局技能**——`sdd-develop-feature` / `sdd-fix-bug` / `sdd-refactor-code` / `sdd-rollback-change` / `sdd-hotfix` / `sdd-release-version` / `sdd-publish-snapshot` / `sdd-bump-dependencies` / `sdd-update-docs` / `sdd-reconcile-external-commits`，装在 `~/.claude/skills/`，所有 SDD 项目共享、更新一次全项目生效。确认它们已安装（缺则提示用户从 sdd-skills 仓库安装）；项目侧无需 `.claude/skills/`。
+- 迭代技能**不拷进项目**：`sdd-develop-feature` / `sdd-fix-bug` / `sdd-refactor-code` / `sdd-rollback-change` / `sdd-hotfix` / `sdd-release-version` / `sdd-publish-snapshot` / `sdd-bump-dependencies` / `sdd-update-docs` / `sdd-reconcile-external-commits` 随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装；项目侧不放 `.claude/skills/`。
 - `templates/docs/{CONTRIBUTING.md, adr/README.md, specs/README.md, specs/_template.md}` → `<project>/docs/`。
 - `templates/github/*` → `<project>/.github/`；`templates/editorconfig.txt` → `.editorconfig`；按栈选 `templates/gitignore-templates/<stack>.gitignore` → `.gitignore`。
 仅替换占位符：项目名、技术栈、提交 scope 例子、测试高风险区、P2/P3 能力、静态检查工具等。
