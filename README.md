@@ -69,6 +69,236 @@ sdd-skills/                         ← 仓库根 = 插件 = marketplace
 
 外加工程化：版本来源与发布渠道、GitHub Flow 分支模型、运维/安全/许可、静态检查。
 
+## 首轮上手：从零到第一个版本
+
+很多人第一次用 SDD 会卡在「init 跑完了，PRD/ADR 都有了，然后呢」。下面是一个新项目从空目录到发出 v0.1.0 的完整路径，按顺序走一遍就懂了。
+
+```
+第 0 步：开场（空目录里说一句）
+    ┌──────────────────────────────────────────────────────────┐
+    │  你：用 SDD 起个新项目 / 给这个空项目套上规格驱动的治理   │
+    │            ↓ 自动触发                                     │
+    │    init-sdd-project 反问你：                              │
+    │      · 项目名、一句话定位、给谁用                         │
+    │      · 技术栈、规模、部署形态                             │
+    │      · 目标 / 非目标                                      │
+    │      · 分期：P1 MVP 做什么、P2 / P3 留什么                │
+    │      · 许可（MIT / Apache-2.0 / 内部保留）                │
+    └──────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+第 1 步：init 产出（项目骨架就位）
+    docs/
+      PRD.md            §4 FR 表带"状态"列：计划 / 开发中 / 已交付@版本
+                        §7 分期表：P1 / P2 / P3 各自的主题
+      ARCHITECTURE.md   模块 / 数据模型 / 机制
+      API.md            接口契约
+      adr/0001-*.md     init 期间敲定的重大决策（技术栈选型等，"现状追认"）
+      specs/_template.md  非平凡功能开发前先复制一份这个写规格
+      OPERATIONS.md · SECURITY.md · CONTRIBUTING.md
+    .claude/rules/      防漂移红线（架构不变量、doc-sync、scope-discipline...）
+    CHANGELOG.md · VERSION（0.1.0）· README · LICENSE · .gitignore · .github/
+    .tmp/实施计划.md    里程碑/任务清单（不入库，会过期）
+
+                              │
+                              ▼
+第 2 步：开始开发 P1（一个 FR 一轮，循环到 P1 全部"开发中"做完）
+
+    打开 PRD §4，挑 P1 里第一个 FR（比如 FR-1），跟 agent 说：
+        "开始开发 FR-1：<那行能力描述>"
+            ↓ 自动触发
+    sdd-develop-feature 帮你走：
+      ① 读 PRD / ARCHITECTURE / 相关 ADR，对齐既定方向
+      ② 非平凡功能 → 复制 docs/specs/_template.md 到 docs/specs/<feature>.md
+         写清需求 / 设计 / 任务 / 验收（小改动免）
+      ③ PRD §4 把 FR-1 的状态从「计划」翻成「开发中」
+      ④ 涉及架构决策 → 新写一条 docs/adr/NNNN-*.md
+      ⑤ 测试先行（写失败测试 → 实现 → 红转绿）
+      ⑥ doc-sync 自检（PRD / ARCH / API 与代码一致）
+      ⑦ CHANGELOG 未发布段 +1 行
+      ⑧ 中文提交 feat(scope): …（不自动 push）
+
+    一个 FR 推完 → 挑下一个 FR 重复，直到 P1 那批 FR 都「开发中」完。
+
+                              │
+                              ▼
+第 3 步：整期验收（P1 自认做完了）
+
+    跟 agent 说："验收一下第一期 / 检查 PRD 完成度"
+            ↓ 自动触发
+    sdd-accept-phase：
+      逐条对 PRD §6 的验收标准核 FR-1 ~ FR-N：
+        · 测试绿（单元 + 集成）   ← 必须真跑，不是 SKIP
+        · 真机过（涉及实机维度时） ← 测试绿 ≠ 真能用
+      产出 .tmp/acceptance-<期>-<日期>.md：逐 FR 通过 / 差距清单。
+
+      不通过的 → sdd-fix-bug 修（写复现测试 → 红 → 绿 + 真机过）
+                  或 sdd-update-docs 改 PRD（代码对、文档过时）
+                  修完回第 3 步复核。
+
+                              │
+                              ▼
+第 4 步：发版收口 ─► P1 真正完工
+
+    全部通过 → 跟 agent 说："发版 v0.1.0 / 出 release"
+            ↓ 自动触发
+    sdd-release-version：
+      ① 阻断验证：构建 + 全部测试再跑一遍，任一失败就停
+      ② 按 commit 自动定 SemVer（feat→MINOR / fix→PATCH / BREAKING→MAJOR）
+      ③ CHANGELOG 未发布段 → ## 0.1.0（YYYY-MM-DD）
+      ④ PRD §4 把交付的 FR 状态翻成「已交付@v0.1.0」（保留不删）
+      ⑤ 更新根 VERSION
+      ⑥ 中文提交 chore(release): 发布 v0.1.0
+      ⑦ 打本地 tag v0.1.0（不 push，你审完手动推）
+
+                              │
+                              ▼
+第 5 步：进入下一期（回到第 2 步开 P2）
+
+    PRD §4 里 P2 的 FR 还是「计划」状态 → 挑一个，对 agent 说"开发 FR-9"
+    回到第 2 步循环。期数本身不动——它就那 3~6 个。
+```
+
+> **新手最常踩的两个坑**：① init 完没动手做开发，直接想"看看 PRD 完成度"——PRD 是个空架子时没法验收，先按第 2 步把 FR 推到「开发中」完成才能验收。② 把「测试全绿」当「做完了」——这是 `sdd-fix-bug` / `sdd-accept-phase` 的硬闸：涉及实机/集成的 FR 必须真机跑过才算 done，否则别走第 4 步。
+
+## 完整流程图
+
+一张图把 14 个技能怎么串起来讲清楚。**主循环**是「日常迭代 → 整期收口 → 下一期」；**偏置流**按需触发，不打断主循环。
+
+```
+                          入口（一次性，二选一）
+                    ┌──────────────────────────────┐
+   空项目 ─────────►│   init-sdd-project           │──┐
+                    ├──────────────────────────────┤  │
+   现有代码 ───────►│   retrofit-to-sdd            │──┘
+                    └──────────────────────────────┘
+                                  │
+              项目就绪：PRD · ARCHITECTURE · ADR · API
+              + docs/specs · .claude/rules · CHANGELOG · VERSION
+                                  ▼
+              ┌──────── 日常迭代循环（按工作项路由）────────┐
+              │                                              │
+   新需求 ───►│   sdd-develop-feature                        │
+   bug ──────►│   sdd-fix-bug                                │
+   重构 ─────►│   sdd-refactor-code                          │
+   回滚 ─────►│   sdd-rollback-change                        │
+   依赖升级 ─►│   sdd-bump-dependencies                      │
+   纯文档 ───►│   sdd-update-docs                            │
+   外部提交 ─►│   sdd-reconcile-external-commits             │
+              │                                              │
+              │  每个技能内置三件套：                         │
+              │   ① 测试先行（写失败测试 → 红 → 绿）         │
+              │   ② doc-sync（代码与 PRD/ARCH/API 不脱节）   │
+              │   ③ 中文提交（feat/fix/refactor…，不自动 push）│
+              │                                              │
+              │  完成判据（硬闸，agent 不能空口说"完成了"）：│
+              │   测试从红转绿 + 涉及实机维度时真机过        │
+              └──────────────────────┬───────────────────────┘
+                                     │
+                              一期 FR 都推完
+                                     ▼
+              ┌──────────── 整期收口 ────────────────────────┐
+              │                                              │
+              │   sdd-accept-phase                           │
+              │   逐条对 PRD §6 / 各 spec 验收               │
+              │   （要测试绿 ✚ 真机证据，缺一不可；          │
+              │     `go test ./...` 全绿 ≠ 真能用）          │
+              │                  │                           │
+              │           ┌──────┴──────┐                    │
+              │       不过 ▼            ▼ 全过               │
+              │     回日常循环修     sdd-release-version     │
+              │     （走对应         → 阻断验证（构建+测试） │
+              │       sdd-fix-bug    → 按 commit 定 SemVer   │
+              │       sdd-update-    → CHANGELOG 未发布段    │
+              │       docs 等）        切成 ## X.Y.Z         │
+              │                      → FR 状态翻             │
+              │                        「已交付@vX.Y.Z」     │
+              │                      → 打本地 tag（不 push） │
+              │                              │               │
+              │                              ▼               │
+              │                    下一期 ─► 回日常循环开 P2 │
+              └──────────────────────────────────────────────┘
+
+              偏置流（不打断主循环，按需触发）
+   给人试用 ────────────► sdd-publish-snapshot（main 自动出快照）
+   生产事故 ────────────► sdd-hotfix（从发布 tag 切补丁版，回流 main）
+   上游模板更新到项目 ──► sdd-sync-governance（治理基线刷新）
+```
+
+**几条关键约束**（沉淀自实战，已写进对应技能的红线）：
+
+- **`done` 由验证门背书，不是声明**：测试绿是必要不充分；涉及实机/集成的，必须真跑过——`sdd-fix-bug` §4 与 `sdd-accept-phase` 都明确这条。
+- **FR 状态归真**：测试绿冒充验收过、把没真做完的 FR 标 `已交付` 是红线；不过的回循环修，标 `开发中`。
+- **稳态层不写过渡话**：`.claude/rules` 与 `sdd-*` 技能只陈述既定事实；"还没做/待落地"放 README 或 `.tmp/`，不入规则。
+- **不自动 push**：所有 `release-version` / `hotfix` / 普通提交均只到本地，由你审完再推。
+
+## 期 · 版本 · FR 状态 · ADR 怎么演进
+
+四个概念很容易绕，分开讲一遍——这套规则被各技能（develop-feature / release-version / accept-phase / update-docs / rules）共同遵守。
+
+### 期（P1 / P2 / P3 …）—— 几乎不动
+
+- 是路线图的**粗粒度横轴**，不是版本、不是功能单位。一期含很多 FR、跨很多版本。
+- 在 PRD §7 维护，**每期只写"主题/目标"**（例：P1=MVP / P2=治理增强 / P3=规模化），不在这里列 FR 编号——具体哪个 FR 属于哪期由 §4 表的"期"列说了算。
+- **什么时候加新期**：开新"大主题"才加。期数总数很少（成熟产品通常 3~6 个）；**产品成熟后（1.0 后稳态迭代）不再加新期**，改按版本（CHANGELOG/tag）+ 功能（FR/specs）组织。
+- **滥用信号**：期数往二十、上百涨 = 把"期"当成版本/功能在用了，停下来反思。
+
+### 版本（SemVer）—— 唯一来源 = 根 `VERSION` 文件
+
+- 由 `sdd-release-version` 按 commit 自动判等级，不是人工拍：
+
+  | 提交内容 | 等级 |
+  |---|---|
+  | 对外契约 / 配置 / 数据模型不兼容；含 BREAKING | **MAJOR +1** |
+  | `feat` 或新增用户可见能力 | **MINOR +1** |
+  | `fix` / `perf` / `refactor` / `docs` / `chore` 且无新增能力 | **PATCH +1** |
+
+- **1.0.0 之前为 0.y.z**，接口可不保证向后兼容（破坏性仍要在 CHANGELOG 标明）。
+- **一期跨多个版本**：P1 可能从 v0.1.0 一路发到 v0.4.0 才把 P1 全部 FR 翻成「已交付」；不要"一期一版本"地误用。
+- **快照 vs 正式**：`sdd-publish-snapshot` 出 `<VERSION>-SNAPSHOT+<sha>`，**不动 VERSION、不动 CHANGELOG 正式段、不打 tag**；`sdd-release-version` 才出 `vX.Y.Z`。
+
+### FR 状态流转 —— PRD §4 表的活索引
+
+```
+   加需求 ──►  计划 ──► 开发中 ──► 已交付@vX.Y.Z（保留不删，便于追溯）
+                              ▲                    │
+                              │  误标 done 的归真   │  发版后此后只
+                              │   ─ 从没工作过      │  修不再翻状态
+                              │     → 回"开发中"   │
+                              │   ─ 真交付过后回归  │
+                              │     → 保留版本号    │
+                              │       并标"回归损坏" │
+                              └─────────────────────┘
+```
+
+- **「计划」→「开发中」**：由 `sdd-develop-feature` 触发时翻。
+- **「开发中」→「已交付@vX.Y.Z」**：由 `sdd-release-version` 自动翻，**前提是 `sdd-accept-phase` 全过**。手工乱改 = 违反 done 由验证门背书的硬闸。
+- **归真**：`sdd-fix-bug` 适用边界写了——发现某 FR 实际是断的但被标已交付，按"从没工作过"还是"真交付过后回归"两种情况处理。
+- **已交付保留不删**：哪怕需求被回滚，也写新 ADR 取代旧决策、把 FR 状态回退到「计划」/「开发中」并在 CHANGELOG 记移除，**不删历史交付行**。
+
+### ADR 演进 —— 不可变 + 取代
+
+- 已接受 ADR 的**决策正文一字不改**。决策变了 → 写新 ADR（编号 = 现有最大 +1），旧 ADR 只改状态行为「已被 ADR-NNNN 取代」并加链接，**不删**。
+- **只写重大决策**：技术栈选型、核心架构取舍、对外契约约定……。给每个小决定写 ADR = 滥用信号。
+- ADR 文件名用英文 slug（`0002-sqlite-storage.md`），标题正文照中文规范。
+- 由 `sdd-develop-feature`（涉及架构决策时）/ `sdd-rollback-change`（回滚带 ADR 的能力）/ `sdd-update-docs`（纯文档写新 ADR）触发。
+
+### 一次变更各动哪些（速查）
+
+| 来了什么 | 要动 | 不用动 | 走哪个技能 |
+|---|---|---|---|
+| **feat 新功能** | PRD §4 加 FR（贴已有期 + `计划`）· 非平凡写 `docs/specs/<f>.md` · 结构变更动 ARCHITECTURE · 接口变更动 API · CHANGELOG +1 · 加测试 | 期数 · VERSION（发版才动） | `sdd-develop-feature` |
+| **fix 修 bug** | CHANGELOG +1 · 复现 + 回归测试 | PRD · 期数 · VERSION · ADR · API | `sdd-fix-bug` |
+| **refactor 重构** | 结构变才动 ARCHITECTURE · 测试前后同样全绿 | PRD · 期数 · API · 行为 | `sdd-refactor-code` |
+| **rollback 回滚** | FR 状态回退 · 取代相关 ADR · CHANGELOG +1（移除） | 期数 | `sdd-rollback-change` |
+| **依赖升级** | 锁文件 · 有感知影响才记 CHANGELOG · 全测试绿 | PRD · 期数 · ADR | `sdd-bump-dependencies` |
+| **架构决策** | **ADR +1 条（或取代旧的）** · 更新 ARCHITECTURE | 期数（除非顺带开新阶段） | `sdd-develop-feature` 或 `sdd-update-docs` |
+| **发版 release** | **VERSION 改（按 commit 定 SemVer）** · CHANGELOG 分段 · 交付的 FR 翻「已交付@vX.Y.Z」· 打本地 tag | 期数 | `sdd-release-version`（前置：`sdd-accept-phase` 全过） |
+| **发快照** | 构建发预发布（`-SNAPSHOT+<sha>`） | VERSION · CHANGELOG · 期数 | `sdd-publish-snapshot` |
+| **开新大阶段（罕见）** | PRD §7 加一行主题 + 启用新期号 P4… | —— 这是**唯一**动期数的时候 | `sdd-update-docs` |
+
+> 谁常动 / 谁不动：🔥 高频 = CHANGELOG（几乎每次）、PRD FR 表（每个 feat 加行 / 发版翻状态）、VERSION（每次发版）；❄ 低频 = ADR（只在架构决策时 +1 或取代）；🧊 几乎不动 = **期数**（只在开新大阶段，罕见）、`.claude/rules` / `sdd-*` 技能（动它 = 动根基，要配 ADR）。
+
 ## 用法
 
 **先安装本技能集**（见下「安装」，Claude Code / Codex / opencode 三选一），之后在**目标项目**的会话里说出意图即可触发：
