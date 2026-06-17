@@ -64,6 +64,9 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 - **PRD §4 FR 表**:在 main 上一次性把所有本批 FR 加行(状态 `计划`)或确认已存在。并行 agent 各自只改"自己那行"的状态(`计划` → `开发中`)。
 - **CHANGELOG 未发布段**:并行 agent 各自把自己的条目**追加在末尾**;不修改其他人加的行。
 - **`docs/specs/<feature>.md`**:每个 FR 一个独立文件,天然不冲突。
+- **ADR 编号预分配**(关键,易踩坑且 git 不会替你报警):并行 agent 各自"看 main 最大 +1"必撞号——更阴的是**不同 slug 的撞号**(如 `0009-auth.md` vs `0009-traffic.md`)**git 会干净合并、不报冲突**,留下两个 ADR-0009。因此**开工前在 main 上确定整批 ADR 号策略**,二选一:
+  - **占位名(推荐)**:并行 agent 一律写 `docs/adr/XXXX-<slug>.md`(标题里也用 `ADR-XXXX`),**真号由本技能在 §7/§8 落地那一刻按入 main 顺序统一分配**。最简单,零撞号风险。
+  - **预留号**:本技能开工前看 main 最大号(如 `0008`),按计划顺序预留(`FR-9→0009 / FR-10→0010 / FR-11→0011`),写进 `.tmp/parallel-plan-<日期>.md`,**每个 agent 提示词里把它分到的号写死**,绝不准自己算。
 
 > 这步预对齐由本技能在主仓库做一次中文提交(`docs(prd): 预登记 FR-9/10/11 待并行开发`),不直接派给 worktree agent。
 
@@ -87,7 +90,9 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 1. 读 docs/PRD.md(关注 FR-X 那行)、docs/ARCHITECTURE.md、相关 docs/adr/
 2. 非平凡功能:复制 docs/specs/_template.md 到 docs/specs/<feature>.md 写规格
 3. PRD §4 把 FR-X 状态从「计划」翻成「开发中」(只改这一行,不动其他人加的行)
-4. 涉及架构决策:写新 docs/adr/NNNN-*.md(编号 = 该 worktree 看到的最大 +1)
+4. 涉及架构决策:写新 ADR 文件,**编号严格按主控分配**——**禁止自己算"max+1"**(并行下必撞,且不同 slug 时 git 不报警,会静默留两个同号):
+   - 若主控分配的是**占位名策略**:文件名用 `docs/adr/XXXX-<slug>.md`、标题写 `# ADR-XXXX`,真号由主控落地时统一替换;
+   - 若主控分配的是**预留号策略**:用主控指定的那个具体编号,不准动其他号。
 5. 测试先行(红→绿)→ 实现 → doc-sync → CHANGELOG 末尾追加一行(只加不改)
 6. 中文 commit(feat(scope): ...)
 7. **完成判据硬闸**:测试从红转绿 + 真机维度真机过(无真机能力时如实报告,标"待真机验",不冒充完成)
@@ -111,6 +116,8 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 - 汇总每个 FR 的状态、证据、触碰文件清单到 `.tmp/parallel-plan-<日期>.md` 的"执行结果"段
 - 标出 `done` / `partial` / `blocked` / `谎报完成`(证据不足或测试未真绿) 
 - **未过完成判据的** → 路由到 `sdd-fix-bug` 接手(不阻塞其他 worktree 进入 rebase)
+- **若用预留号策略**:逐 worktree 验证 ADR 文件名 / 标题用的就是分配号,**不准擅自换号**;有偏差立即纠正再进 §7。
+- **若用占位名策略**:确认所有新 ADR 都是 `XXXX-<slug>.md`(没有 agent 偷偷算成 `00NN`)。
 
 ### 7. 按确认的集成方式整合到主分支(rebase 或 merge)
 
@@ -139,9 +146,17 @@ git fetch
 冲突常见来源:
 - PRD §4 同行被多 agent 改(本应被第 3 步预对齐避免,若仍冲突 = 预对齐没做透)
 - CHANGELOG 段尾顺序(多 agent 同时追加)
-- 共同依赖的 ADR 编号撞号
+- **ADR 编号撞号(易漏)**:同号同 slug → git 报冲突,看得见;**同号不同 slug → git 不报、干净合并、静默留下两个同号 ADR**。**整合前/整合后必须主动跑重号检测**(任何一种集成方式都要跑):
+  ```
+  # 查重号(应为空输出)
+  ls docs/adr/*.md | sed -E 's#.*/0*([0-9]+)-.*#\1#' | sort | uniq -d
+  # 查 XXXX 占位号是否还残留没替(若用占位名策略)
+  ls docs/adr/XXXX-*.md 2>/dev/null
+  ```
+  若用**占位名策略**:在此处**按入 main 顺序**(rebase 后的提交时序 / merge 的合并时序)给每个占位 ADR 分配真号,并 `git mv XXXX-foo.md NNNN-foo.md` + 改文件内 `ADR-XXXX` 标题 + grep 全仓库追平所有 `XXXX`/旧编号引用(PRD / ARCHITECTURE / 其它 ADR 的"已被取代"链 / CHANGELOG / 代码注释)。
+  若用**预留号策略**且仍撞号:说明哪个 agent 违反了第 5 步指令,先纠正再合;不准默默 `git mv` 蒙混。
 
-**冲突原则(rebase / merge 都适用)**:本技能**不强推、不自动解冲突**(不 `--force`、不删除提交、不 `git checkout .`、不 `-X ours/theirs`),把冲突文件列给用户、问处理方式。
+**冲突原则(rebase / merge 都适用)**:本技能**不强推、不自动解冲突**(不 `--force`、不删除提交、不 `git checkout .`、不 `-X ours/theirs`),把冲突文件列给用户、问处理方式。**ADR 重号一律以重号检测命令为准,不能依赖 git 状态。**
 
 ### 8. 落地到 main(不自动)
 
@@ -184,4 +199,4 @@ git fetch
 
 ## 红线
 
-跳过依赖分析就并行 · 没拿用户授权擅自 `git worktree` · **没问用户集成方式(rebase / merge)就开工** · **不问就默认 / 擅自用 merge(或 rebase)整合** · agent 报"完成了"不出示证据就整合 · 自动 push / 自动合 main · 冲突用 `--force`、`-X ours/theirs` 或丢弃提交强推 / 自动蒙混 · 并行超过用户确认的上限 · 在 worktree 改全局文件期望"扩散" · 用本技能"塞"单个 FR(直接 `sdd-develop-feature` 即可,不要为加 worktree 而加)。
+跳过依赖分析就并行 · 没拿用户授权擅自 `git worktree` · **没问用户集成方式(rebase / merge)就开工** · **不问就默认 / 擅自用 merge(或 rebase)整合** · agent 报"完成了"不出示证据就整合 · 自动 push / 自动合 main · 冲突用 `--force`、`-X ours/theirs` 或丢弃提交强推 / 自动蒙混 · 并行超过用户确认的上限 · 在 worktree 改全局文件期望"扩散" · 用本技能"塞"单个 FR(直接 `sdd-develop-feature` 即可,不要为加 worktree 而加) · **让并行 agent 各自"max+1"写 ADR 编号** · **整合前后不跑 ADR 重号检测**(git 不会替你报 ADR 静默撞号)。
