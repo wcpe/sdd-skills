@@ -1,6 +1,6 @@
 ---
 name: sdd-parallel-develop
-description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行开发多个 FR 时使用——分析依赖 → 为可并行的 FR 各创建独立 git worktree → spawn 并行 agent(每个 worktree 内走 sdd-develop-feature 全流程)→ 各自过完成判据 → 按依赖顺序自动 rebase 到主分支。当用户说"批量开 P2 / 并行做 FR-X/Y/Z / 一次性把这几个 FR 都做了 / 用 worktree 同时开几个分支并行迭代 / 让多个 agent 同时各做一个 FR"时触发。**触发本技能即用户明示授权使用 git worktree**(与全局规则"未明确指示不擅自用 worktree"不冲突);rebase 冲突时报告而非强推,不自动合 main,不自动 push。
+description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行开发多个 FR 时使用——分析依赖 → 为可并行的 FR 各创建独立 git worktree → spawn 并行 agent(每个 worktree 内走 sdd-develop-feature 全流程)→ 各自过完成判据 → 按开工前与用户确认的集成方式(rebase 或 merge)整合回主分支。当用户说"批量开 P2 / 并行做 FR-X/Y/Z / 一次性把这几个 FR 都做了 / 用 worktree 同时开几个分支并行迭代 / 让多个 agent 同时各做一个 FR"时触发。**触发本技能即用户明示授权使用 git worktree**(与全局规则"未明确指示不擅自用 worktree"不冲突)。**集成方式(rebase / merge)开工前必须问用户、禁止不问就直接用 merge(或 rebase)默认整合**;冲突时报告而非强推,不自动合 main,不自动 push。
 ---
 
 # 并行开发多个 FR
@@ -12,7 +12,7 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 1. **先分析依赖** —— FR-A 依赖 FR-B 时不可并行,只能 FR-B 落 main 后再开 FR-A。跳过这步必然在后续 rebase 时撞墙。
 2. **隔离工作区** —— 每个并行 FR 一个 git worktree(独立目录、独立分支),互不踩。
 3. **沿用 `sdd-develop-feature` 强制流程** —— 每个 worktree 里的 agent 走完整流程(对齐 PRD/ARCH → 测试先行 → 实现 → doc-sync → 中文提交);**完成判据硬闸不能绕过**:测试从红转绿 + 涉及实机维度时真机过。
-4. **rebase 到 main 后再合** —— 并行结束按依赖顺序 rebase,冲突报告给用户,不强推、不自动合。
+4. **整合回 main(方式开工前先问)** —— 集成用 **rebase**(线性历史)还是 **merge**(保留合并提交)由项目的 git 哲学决定,agent 无从替用户拍板,所以**开工前必须问、得到答复才开 worktree;禁止默认/擅自用 merge 或 rebase**。并行结束按依赖顺序、用选定方式整合,冲突报告给用户,不强推、不自动合。
 
 并行的目的是**省墙钟时间**,不是省纪律。任何一步降级判据就回到了"agent 谎报完成"的坑。
 
@@ -47,13 +47,15 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 第二批(等第一批合后):
   - FR-12 (依赖 FR-11)
 主分支: master
+集成方式: <rebase / merge —— 开工前必须问用户,未答不开 worktree>
 预计并行 agent 数: 3
 ```
 
 要点:
+- **集成方式必须先问**(阻断项):本批整合回主分支用 `rebase`(线性历史、各分支 replay 到 main 之上)还是 `merge`(保留合并提交、历史有分叉)?这取决于项目的 git 哲学(是否在意线性历史、分支是否已 push 给别人),**agent 不替用户拍板**。**在用户明确回答前,不创建 worktree、不开工**;**禁止不问就按 merge 或 rebase 默认**。把答复记进计划的"集成方式"行,后续 §7/§8 严格照此执行。
 - **默认并行上限 4 个**;超过让用户显式确认(`确认并行 N 个`)
 - worktree 路径用户可改(默认 `../<repo-name>-fr-<编号>-<slug>/`)
-- 让用户确认:授权用 worktree、确认路径、确认依赖图无误
+- 让用户确认:授权用 worktree、确认路径、确认依赖图无误、**确认集成方式(rebase / merge)**
 
 ### 3. 预先在 main 上对齐"会被所有并行 agent 同时改"的文件
 
@@ -110,20 +112,28 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 - 标出 `done` / `partial` / `blocked` / `谎报完成`(证据不足或测试未真绿) 
 - **未过完成判据的** → 路由到 `sdd-fix-bug` 接手(不阻塞其他 worktree 进入 rebase)
 
-### 7. 按依赖顺序 rebase 到主分支
+### 7. 按确认的集成方式整合到主分支(rebase 或 merge)
 
-并行结束 → 主控会话统一做(不让 agent 各自 rebase 避免竞态):
+并行结束 → 主控会话统一做(不让 agent 各自整合避免竞态)。**用哪种方式以第 2 步用户确认的"集成方式"为准;用户没确认就别动手整合,回去补问。**
 
+**若选 `rebase`(线性历史):**
 ```
 git fetch                                  # 拉 main 最新
-对每个 done 的 worktree(可同时,无依赖):
+对每个 done 的 worktree(无依赖可同时):
   cd <worktree>
   git rebase <main>
-  if 冲突:
-    git rebase --abort        # 不强推、不 --force
-    报告冲突文件给用户,问是否协助手动解
-  else:
-    rebase 完成,留在 worktree
+  冲突 → git rebase --abort（不强推、不 --force），报告冲突文件、问用户
+  无冲突 → rebase 完成,留在 worktree(分支已在 main 之上,§8 可 fast-forward 落地)
+```
+
+**若选 `merge`(保留合并历史):**
+```
+git fetch
+对每个 done 的 worktree:
+  cd <worktree>
+  git merge <main>          # 把 main 的新提交并入本分支,消除基线漂移
+  冲突 → git merge --abort，报告冲突文件、问用户（禁止 -X ours/theirs 自动蒙混）
+  无冲突 → 合并完成,留在 worktree(§8 用 --no-ff 落地保留分支结构)
 ```
 
 冲突常见来源:
@@ -131,22 +141,24 @@ git fetch                                  # 拉 main 最新
 - CHANGELOG 段尾顺序(多 agent 同时追加)
 - 共同依赖的 ADR 编号撞号
 
-**冲突原则**:本技能**不强推**(不 `--force`、不删除提交、不 `git checkout .`),把冲突文件列给用户、问处理方式。
+**冲突原则(rebase / merge 都适用)**:本技能**不强推、不自动解冲突**(不 `--force`、不删除提交、不 `git checkout .`、不 `-X ours/theirs`),把冲突文件列给用户、问处理方式。
 
-### 8. 合到 main(不自动)
+### 8. 落地到 main(不自动)
 
-本技能**默认不合**,产出一份"合并队列"给用户:
+本技能**默认不落地**,产出一份"合并队列"给用户。**落地方式跟随第 2 步选定的集成方式,不在这里临时改口:**
+- **rebase 路线** → 各分支已在 main 之上,落地用 fast-forward(`git merge --ff-only feature/...`),主分支线性、无多余合并提交。
+- **merge 路线** → 落地用合并提交(`git merge --no-ff feature/...`),保留分支结构,便于回溯"这批是一起并行做的"。
 
 ```
 建议合并顺序(按完成时间/规模/依赖):
-  ① feature/fr-9-gray   → 合 main
-  ② feature/fr-10-traffic → 合 main
-  ③ feature/fr-11-auth  → 合 main(merge / fast-forward 由用户选)
+  ① feature/fr-9-gray     → 落 main
+  ② feature/fr-10-traffic → 落 main
+  ③ feature/fr-11-auth    → 落 main(用选定方式:ff-only 或 --no-ff)
 ```
 
-让用户决定:
-- 逐个合(merge / fast-forward / squash)
-- 等下一轮 `sdd-accept-phase` 整期验收再合
+让用户决定最终时机(方式已定、时机仍由用户拍):
+- 逐个落地(按选定方式)
+- 等下一轮 `sdd-accept-phase` 整期验收再落地
 - 留作 PR 走 review
 
 ### 9. 清理 worktree
@@ -172,4 +184,4 @@ git fetch                                  # 拉 main 最新
 
 ## 红线
 
-跳过依赖分析就并行 · 没拿用户授权擅自 `git worktree` · agent 报"完成了"不出示证据就 rebase · 自动 push / 自动合 main · rebase 冲突用 `--force` 或丢弃提交强推 · 并行超过用户确认的上限 · 在 worktree 改全局文件期望"扩散" · 用本技能"塞"单个 FR(直接 `sdd-develop-feature` 即可,不要为加 worktree 而加)。
+跳过依赖分析就并行 · 没拿用户授权擅自 `git worktree` · **没问用户集成方式(rebase / merge)就开工** · **不问就默认 / 擅自用 merge(或 rebase)整合** · agent 报"完成了"不出示证据就整合 · 自动 push / 自动合 main · 冲突用 `--force`、`-X ours/theirs` 或丢弃提交强推 / 自动蒙混 · 并行超过用户确认的上限 · 在 worktree 改全局文件期望"扩散" · 用本技能"塞"单个 FR(直接 `sdd-develop-feature` 即可,不要为加 worktree 而加)。
