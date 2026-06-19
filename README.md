@@ -23,7 +23,7 @@
 | `sdd-bump-dependencies` | 升级第三方依赖 |
 | `sdd-update-docs` | 纯文档任务（PRD/ARCH/ADR…） |
 | `sdd-reconcile-external-commits` | 同步绕过流程的提交到文档 |
-| `sdd-accept-phase` | 整期 / 里程碑验收 · 发版就绪审计 |
+| `sdd-accept-phase` | 验收：整期 / 当前版本待发 / 当前一批改动（scope 三选一，发布·合并就绪审计） |
 | `sdd-realign-prd` | PRD 结构 / 状态不合规时的诊断 + 工单（不亲自改） |
 | `sdd-parallel-develop` | 并行开发多个 FR（依赖分析 + worktree + 并行 agent + 自动 rebase） |
 | `sdd-sync-governance` | 把上游治理模板同步进现有项目 |
