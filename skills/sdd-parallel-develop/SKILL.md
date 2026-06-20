@@ -1,6 +1,6 @@
 ---
 name: sdd-parallel-develop
-description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行开发多个 FR 时使用——分析依赖 → 为可并行的 FR 各创建独立 git worktree → spawn 并行 agent(每个 worktree 内走 sdd-develop-feature 全流程)→ 各自过完成判据 → 按开工前与用户确认的集成方式(rebase 或 merge)整合回主分支。当用户说"批量开 P2 / 并行做 FR-X/Y/Z / 一次性把这几个 FR 都做了 / 用 worktree 同时开几个分支并行迭代 / 让多个 agent 同时各做一个 FR"时触发。**触发本技能即用户明示授权使用 git worktree**(与全局规则"未明确指示不擅自用 worktree"不冲突)。**集成方式(rebase / merge)开工前必须问用户、禁止不问就直接用 merge(或 rebase)默认整合**;冲突时报告而非强推,不自动合 main,不自动 push。
+description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行开发多个 FR 时使用——分析依赖 → 为可并行的 FR 各创建独立 git worktree → spawn 并行 agent(每个 worktree 内走 sdd-develop-feature 全流程)→ 各自过完成判据 → 按开工前与用户确认的集成方式(rebase 或 merge)整合回主分支。当用户说"批量开 P2 / 并行做 FR-X/Y/Z / 一次性把这几个 FR 都做了 / 用 worktree 同时开几个分支并行迭代 / 让多个 agent 同时各做一个 FR"时触发。**触发本技能即用户明示授权使用 git worktree**(与全局规则"未明确指示不擅自用 worktree"不冲突)。**集成方式(rebase / merge)开工前必须问用户、禁止不问就直接用 merge(或 rebase)默认整合**;**整合前先给 main 与所有分支建备份分支(可一键回滚;金贵批次再加 git bundle 离线档)**;冲突时报告而非强推,不自动合 main,不自动 push。
 ---
 
 # 并行开发多个 FR
@@ -123,6 +123,26 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 
 并行结束 → 主控会话统一做(不让 agent 各自整合避免竞态)。**用哪种方式以第 2 步用户确认的"集成方式"为准;用户没确认就别动手整合,回去补问。**
 
+**7.0 整合前必做:备份 main 与所有待整合分支(防整合搞坏无法回滚)**
+
+整合那步——**rebase 会重写分支历史、merge 会给 main 加合并提交**——即便 git 没报冲突,也可能"成功但语义搞坏"。所以**动 rebase/merge 之前,先给 main 和每个待整合分支建备份分支,并把 SHA 记进计划文件**,这样任何一步出问题都能**一键还原**,不依赖会过期、看着也乱的 reflog:
+
+```
+日期戳=<YYYYMMDD-HHMM>
+# 备份落地目标 main（备份分支只建不 checkout，免得手滑提交把它移动）
+git branch backup/main-pre-integrate-<日期戳> <main>
+# 备份每个 done 的 feature 分支（rebase 会改写它的 commit SHA，尤其要备）
+对每个分支: git branch backup/<branch 斜杠转横线>-pre-integrate-<日期戳> <branch>
+git branch --list "backup/*pre-integrate-<日期戳>"   # 自验都建了
+# 把这些备份分支名 + 对应 SHA 抄进 .tmp/parallel-plan-<日期>.md「备份」段
+```
+
+回滚怎么做(列给用户,本技能**不自动 reset**):
+- main 被搞乱 → `git reset --hard backup/main-pre-integrate-<日期戳>`
+- 某分支 rebase/merge 错了 → `cd <worktree> && git reset --hard backup/<branch>-pre-integrate-<日期戳>`
+
+> 这些是**本地备份分支、不 push**(契合"不自动 push")。**金贵 / 不可重做的批次**可再加一份 repo 外的离线档,删分支 / gc 都不怕:`git bundle create ../<repo>-pre-integrate-<日期戳>.bundle --all`。整批落地确认无误、用户点头后再 `git branch -D backup/*-pre-integrate-<日期戳>` 清理(bundle 档直接删文件),或留着当历史——由用户决定,本技能不擅自删备份。
+
 **若选 `rebase`(线性历史):**
 ```
 git fetch                                  # 拉 main 最新
@@ -181,6 +201,7 @@ git fetch
 用户确认合完后:
 - `git worktree remove <path>`(每个)
 - 分支可保留也可 `git branch -d`(已合且无引用)
+- **§7.0 的备份分支**(及 bundle 档,若有):**确认整批落地无误、用户点头后才删**(`git branch -D backup/*-pre-integrate-<日期戳>`;bundle 直接删文件);用户想留作历史就别删。删早了就失去回滚锚点了。
 
 ## 与其他技能的关系
 
@@ -199,4 +220,4 @@ git fetch
 
 ## 红线
 
-跳过依赖分析就并行 · 没拿用户授权擅自 `git worktree` · **没问用户集成方式(rebase / merge)就开工** · **不问就默认 / 擅自用 merge(或 rebase)整合** · agent 报"完成了"不出示证据就整合 · 自动 push / 自动合 main · 冲突用 `--force`、`-X ours/theirs` 或丢弃提交强推 / 自动蒙混 · 并行超过用户确认的上限 · 在 worktree 改全局文件期望"扩散" · 用本技能"塞"单个 FR(直接 `sdd-develop-feature` 即可,不要为加 worktree 而加) · **让并行 agent 各自"max+1"写 ADR 编号** · **整合前后不跑 ADR 重号检测**(git 不会替你报 ADR 静默撞号)。
+跳过依赖分析就并行 · 没拿用户授权擅自 `git worktree` · **没问用户集成方式(rebase / merge)就开工** · **不问就默认 / 擅自用 merge(或 rebase)整合** · agent 报"完成了"不出示证据就整合 · 自动 push / 自动合 main · 冲突用 `--force`、`-X ours/theirs` 或丢弃提交强推 / 自动蒙混 · 并行超过用户确认的上限 · 在 worktree 改全局文件期望"扩散" · 用本技能"塞"单个 FR(直接 `sdd-develop-feature` 即可,不要为加 worktree 而加) · **让并行 agent 各自"max+1"写 ADR 编号** · **整合前后不跑 ADR 重号检测**(git 不会替你报 ADR 静默撞号)· **整合前不给 main 与分支建备份(分支)就 rebase/merge**(出问题无锚点可回滚)· 没等用户确认整批落地无误就删备份分支。
