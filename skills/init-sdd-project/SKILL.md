@@ -36,7 +36,7 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 
 ### 3. 原样安装通用治理（从 `templates/` 拷贝，仅替换占位符）
 - `templates/claude-rules/*` → `<project>/.claude/rules/`（comments / config-files / git-commit / doc-sync / decision-alignment / scope-discipline / testing-and-quality / static-analysis / README）。
-- 迭代技能**不拷进项目**：`sdd-develop-feature` / `sdd-fix-bug` / `sdd-refactor-code` / `sdd-rollback-change` / `sdd-hotfix` / `sdd-release-version` / `sdd-publish-snapshot` / `sdd-bump-dependencies` / `sdd-update-docs` / `sdd-reconcile-external-commits` / `sdd-accept-phase` / `sdd-realign-prd` / `sdd-parallel-develop` / `sdd-review-code` / `sdd-sync-governance` 随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装；项目侧不放 `.claude/skills/`。
+- 迭代技能**不拷进项目**：`sdd-brainstorming` / `sdd-develop-feature` / `sdd-fix-bug` / `sdd-refactor-code` / `sdd-rollback-change` / `sdd-hotfix` / `sdd-release-version` / `sdd-publish-snapshot` / `sdd-bump-dependencies` / `sdd-update-docs` / `sdd-reconcile-external-commits` / `sdd-accept-phase` / `sdd-realign-prd` / `sdd-parallel-develop` / `sdd-review-code` / `sdd-sync-governance` 随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装；项目侧不放 `.claude/skills/`。
 - `templates/docs/{CONTRIBUTING.md, adr/README.md, specs/README.md, specs/_template.md}` → `<project>/docs/`。
 - `templates/github/*` → `<project>/.github/`；`templates/editorconfig.txt` → `.editorconfig`；按栈选 `templates/gitignore-templates/<stack>.gitignore` → `.gitignore`。
 - 写 `.claude/rules/.sdd-version` 记来源戳：当前 sdd-skills 版本（读 `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` 的 `version`，是 git 检出再附 `commit`）+ 日期 + 来源技能，供 `sdd-sync-governance` 日后增量升级治理用。
