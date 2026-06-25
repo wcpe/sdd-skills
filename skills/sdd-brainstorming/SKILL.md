@@ -41,33 +41,45 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。把一个完
   - **纯结构 / 可读性**(行为不变) → **ref / refactor**
   - **纯文档** → **docs**
 
-### 3. 为每条 FR 定明确验收标准（"验收 FR"）
+### 3. spec 判定（需不需要写规格）
+- 对每条 **feat / 增强类** FR 过 **spec-checklist**（客观规则，不靠感觉判断"简不简单"；增强无论"新建 FR"还是"在原 FR 上扩"都要过）。**命中任意一条 → 该 FR 标 `需 spec`；全部不命中 → 标 `免 spec`**：
+  1. **引入新数据模型 / 表 / Schema**——数据结构变更影响面大，必须写清设计
+  2. **引入新外部接口**——API、命令、事件、配置项等，接口即契约，写下来才能审核
+  3. **跨模块**——改动涉及 ≥2 个模块，边界不清就是返工的根
+  4. **需要新 ADR 或推翻已有 ADR**——架构决策需要 spec 级别的设计支撑
+  5. **有下游依赖**——其他 FR 依赖本 FR 先完成，被别人依赖的规格必须写死，不然连环翻车
+  6. **涉及并发 / 事务 / 锁 / 状态机**——高风险区，靠脑子想不够
+- fix / ref / docs 类条目**免 spec**（走对应技能自身的流程）。
+- spec 判定结果写在每条 FR 旁边，随计划传递给下游；`sdd-develop-feature` / `sdd-parallel-develop` 不再重新判定，直接按判定结果执行。
+
+### 4. 为每条 FR 定明确验收标准（"验收 FR"）
 - 每条 feat FR 写**可验证的验收标准**(将来进 PRD §6 / 该 FR 的 `docs/specs/<feature>.md`),让 `sdd-develop-feature` 测试先行有靶子、`sdd-accept-phase` 有据可依。
+- 标了 `需 spec` 的 FR：此处写粗验收（用户层面的"怎样算完成"），详细设计留到 `docs/specs/<feature>.md`。标了 `免 spec` 的 FR：此处验收要足够具体，可直接作为测试依据。
 - 涉及实机 / 集成 / 真实环境维度的,验收标准里**点明"要真机过"**(`测试绿 ≠ 真能用`)。
 - 没有可验证验收的 FR 不算拆完——"做完就行"是红线。
 
-### 4. 排依赖序（为执行方式做准备）
+### 5. 排依赖序（为执行方式做准备）
 - 标出条目间**依赖**(A 要等 B 先落)——它决定能不能并行,是下一步定执行方式与 `sdd-parallel-develop` 的输入。
 
-### 5. present + 用户确认（登记前的闸）
-- 把结果列给用户:**FR 清单**(分类 + 验收标准 + 依赖序 + 执行方式建议)。
+### 6. present + 用户确认（登记前的闸）
+- 把结果列给用户:**FR 清单**(分类 + spec 判定 + 验收标准 + 依赖序 + 执行方式建议)。
 - 有设计岔路时给 **2-3 个方案 + 推荐**(同 brainstorming),让用户拍。
 - **用户确认后才登记**;不擅自改 PRD、不擅自起开发。
 
-### 6. 确定执行方式 + 登记 + 路由（确认后）
+### 7. 确定执行方式 + 登记 + 路由（确认后）
 - **确定执行方式**:
   - 1 条 feat → `sdd-develop-feature` 单跑
   - ≥2 条**无相互依赖**的 feat → `sdd-parallel-develop`(依赖序已备好;它会再问 rebase / merge 等)
   - 有依赖链 → 分批:可并行的先一批,被依赖的等前批落 main 再开
   - fix → `sdd-fix-bug`;ref → `sdd-refactor-code`;docs → `sdd-update-docs`;归真 → `sdd-fix-bug`
 - **登记**:feat FR 加进 `docs/PRD.md` §4(状态 `计划`、贴期、附验收草拟);fix / ref / docs 记进计划的待办段(fix 不进 PRD §4)。
-- **产出**:计划写 `.tmp/brainstorm-<需求名>-<日期>.md`(**不入库**):FR · 分类 · 验收 · 依赖序 · 执行方式 · 路由。
+- **产出**:计划写 `.tmp/brainstorm-<需求名>-<日期>.md`(**不入库**):FR · 分类 · spec 判定 · 验收 · 依赖序 · 执行方式 · 路由。**spec 判定结果随计划传递给下游**（`sdd-develop-feature` / `sdd-parallel-develop` 不再重新判定，直接按计划执行）。
 
 ## 与其他技能的关系
 - **盘问方法**参考 superpowers 的 `brainstorming`,但**用我们自己的流程、不依赖它**(它没装也照跑)。
-- **下游**:产出的 FR + 依赖序喂 `sdd-develop-feature`(单个)/ `sdd-parallel-develop`(批量);fix 喂 `sdd-fix-bug`。
+- **下游**:产出的 FR + spec 判定 + 依赖序喂 `sdd-develop-feature`(单个)/ `sdd-parallel-develop`(批量);fix 喂 `sdd-fix-bug`。下游按判定结果执行，不再自己重新判断要不要写 spec。
 - **与 `sdd-realign-prd` 对称**:本技能**吃新需求、盘清拆解登记**;`sdd-realign-prd` 整理**已存在**的 PRD 结构。
 - 它是**日常迭代循环的前置门**——之前循环假定你已知"这是一个 feat / 一个 fix",本技能补上"先把大需求盘清、拆成带验收的确切 FR"。
 
 ## 红线
-需求没盘清就开拆(基于臆测)· 只做 feat / fix 二分而漏掉 ref / 增强 / 归真 / docs · 把"修已坏"误当净新能力塞进 PRD 当新 FR · 拆出的 FR 没有可验证验收标准("做完就行")· 拆完不经用户确认就改 PRD / 起开发 · 借拆解之名直接写实现代码 · 把计划入库(应留 `.tmp/`)· 给一个清楚的小需求硬套本技能(直接 `sdd-develop-feature` / `sdd-fix-bug` 即可)。
+需求没盘清就开拆(基于臆测)· 只做 feat / fix 二分而漏掉 ref / 增强 / 归真 / docs · 把"修已坏"误当净新能力塞进 PRD 当新 FR · 拆出的 FR 没有可验证验收标准("做完就行")· **凭感觉判断"简不简单"绕过 spec-checklist** · 拆完不经用户确认就改 PRD / 起开发 · 借拆解之名直接写实现代码 · 把计划入库(应留 `.tmp/`)· 给一个清楚的小需求硬套本技能(直接 `sdd-develop-feature` / `sdd-fix-bug` 即可)。

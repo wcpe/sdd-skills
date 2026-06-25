@@ -13,7 +13,7 @@
 | 文档 | 管什么 | 何时更新 | 入库 |
 |---|---|---|---|
 | `docs/PRD.md` | 需求（WHAT/WHY）：目标、角色、功能需求、验收 | 需求增删改时 | ✓ 活文档 |
-| `docs/specs/<feature>.md` | 非平凡功能的开发期工作规格（需求/设计/任务/验收） | 开发该功能时 | ✓ 留作记录 |
+| `docs/specs/<feature>.md` | 功能开发期的工作规格（需求/设计/任务/验收），命中 spec-checklist 才写 | 开发该功能时 | ✓ 留作记录 |
 | `docs/ARCHITECTURE.md` | 系统设计（HOW）：模块、数据模型、机制、部署 | 结构/机制/依赖变化时 | ✓ |
 | `docs/adr/*` | 重大决策的"为什么" | 做出/推翻架构决策时（见 §3） | ✓ |
 | `docs/API.md` | 对外接口契约 | 接口变更时 | ✓ |
@@ -154,7 +154,7 @@
 
 | 来了什么 | 要动 | 不用动 |
 |---|---|---|
-| **feat 新功能** | PRD §4 加一行 FR（贴**已有**期 + 状态 `计划`）· 非平凡写 `docs/specs/<f>.md` · 结构变更动 `ARCHITECTURE` · 接口变更动 `API` · `CHANGELOG` +1 行 · 加测试 | 期数 · `VERSION`（发版才动） |
+| **feat 新功能** | PRD §4 加一行 FR（贴**已有**期 + 状态 `计划`）· 命中 spec-checklist 任一条则写 `docs/specs/<f>.md`（见 [`specs/README.md`](specs/README.md)）· 结构变更动 `ARCHITECTURE` · 接口变更动 `API` · `CHANGELOG` +1 行 · 加测试 | 期数 · `VERSION`（发版才动） |
 | **fix 修 bug** | `CHANGELOG` +1 行 · 复现 + 回归测试 | PRD · 期数 · `VERSION` · ADR · API |
 | **refactor 重构** | 结构变才动 `ARCHITECTURE` · 测试前后同样全绿 | PRD · 期数 · API · 行为 |
 | **rollback 回滚** | FR 状态回退 · 取代相关 ADR · `CHANGELOG` +1（移除） | 期数 |

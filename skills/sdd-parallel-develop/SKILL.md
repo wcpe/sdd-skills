@@ -32,6 +32,13 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
   - PRD 里显式 `依赖: FR-X` 字段
   - 对应 ADR 提到的前置条件
   - spec(`docs/specs/<feature>.md`)里写明的 blocker
+- **对每条 FR 过 spec-checklist**（6 条，命中任意一条 → 标 `需 spec`；全部不命中 → 标 `免 spec`）。如果从 `sdd-brainstorming` 路由来已带判定结果，直接采用，不重新判定。checklist：
+  1. 引入新数据模型 / 表 / Schema
+  2. 引入新外部接口（API、命令、事件、配置项）
+  3. 跨模块（改动涉及 ≥2 个模块）
+  4. 需要新 ADR 或推翻已有 ADR
+  5. 有下游依赖（其他 FR 依赖本 FR 先完成）
+  6. 涉及并发 / 事务 / 锁 / 状态机
 - 构建依赖图,圈出**「第一批可并行」**(节点入度=0 或仅依赖已 `已交付@版本` 的 FR)
 - 有相互依赖的归入**「第二批/第三批」**,标"等第 N 批合 main 后开"
 
@@ -41,9 +48,9 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 
 ```
 第一批(可并行,N 个):
-  - FR-9  灰度  → worktree: ../beacon-fr-9-gray/
-  - FR-10 流量调度 → worktree: ../beacon-fr-10-traffic/
-  - FR-11 鉴权 → worktree: ../beacon-fr-11-auth/
+  - FR-9  灰度    spec:需/免 → worktree: ../beacon-fr-9-gray/
+  - FR-10 流量调度 spec:需/免 → worktree: ../beacon-fr-10-traffic/
+  - FR-11 鉴权    spec:需/免 → worktree: ../beacon-fr-11-auth/
 第二批(等第一批合后):
   - FR-12 (依赖 FR-11)
 主分支: master
@@ -52,25 +59,40 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 ```
 
 要点:
-- **集成方式必须先问**(阻断项):本批整合回主分支用 `rebase`(线性历史、各分支 replay 到 main 之上)还是 `merge`(保留合并提交、历史有分叉)?这取决于项目的 git 哲学(是否在意线性历史、分支是否已 push 给别人),**agent 不替用户拍板**。**在用户明确回答前,不创建 worktree、不开工**;**禁止不问就按 merge 或 rebase 默认**。把答复记进计划的"集成方式"行,后续 §7/§8 严格照此执行。
+- **集成方式必须先问**(阻断项):本批整合回主分支用 `rebase`(线性历史、各分支 replay 到 main 之上)还是 `merge`(保留合并提交、历史有分叉)?这取决于项目的 git 哲学(是否在意线性历史、分支是否已 push 给别人),**agent 不替用户拍板**。**在用户明确回答前,不创建 worktree、不开工**;**禁止不问就按 merge 或 rebase 默认**。把答复记进计划的"集成方式"行,后续 §8/§9 严格照此执行。
 - **默认并行上限 4 个**;超过让用户显式确认(`确认并行 N 个`)
 - worktree 路径用户可改(默认 `../<repo-name>-fr-<编号>-<slug>/`)
 - 让用户确认:授权用 worktree、确认路径、确认依赖图无误、**确认集成方式(rebase / merge)**
 
-### 3. 预先在 main 上对齐"会被所有并行 agent 同时改"的文件
+### 3. spec 前置：写 + 审核（并行前必须完成）
+
+**并行场景下 spec 必须前置——不能在 agent 进场后边写边审。** 原因：若某个 agent 的 spec 审核不通过导致 FR 修改，会影响其他已在跑的 agent（共享数据模型、接口、依赖关系），全部返工。
+
+- **只处理标了 `需 spec` 的 FR**；`免 spec` 的跳过此步。
+- 主控逐条写 spec（复制 `docs/specs/_template.md`，填入需求/设计/任务/验收）。**spec 里引用本批新 ADR 一律用占位 `ADR-XXXX`**——此刻 §4 的 ADR 号策略尚未落地、别写死号；真号到 §8/§9 落地时连同 spec 内引用一起追平（见 §8 重号处理）。
+- **逐条出示用户审核**，全部通过后才进第 4 步。
+- 审核不通过分级处理：
+  - **设计细节问题**（任务拆分不合理 / 漏边界 / 验收不可验证）→ 按反馈修改 spec → 重新出示 → 通过后继续。
+  - **FR 本身定义有冲突**（验收标准与设计自相矛盾）→ **停下报告用户**，不擅自改 PRD；等用户拍板（修改 PRD / 调整 FR / 拆分等）后再继续。
+  - **某条 spec 的设计 / 接口牵动其他 FR** → 检查关联 FR 的 spec/PRD，必要时一并调整、全部重审；**若暴露出 §1 依赖图未识别的跨-FR 依赖**（原判「可并行」的两个 FR 其实有先后）→ **回退 §1 重建依赖图、重新分批**（受影响 FR 可能从第一批降到第二批），不在原批次硬开。
+- **全通过后**：已审核的 spec 就是最终施工图纸，agent 不再写 spec、不再审 spec，直接按图施工。**这批 spec 随 §4 的预对齐提交一起落到 main**（见 §4），确保 §5 创建的 worktree 里带着它们。
+
+### 4. 预先在 main 上对齐"会被所有并行 agent 同时改"的文件
 
 这一步是**避免可预见的 rebase 冲突**:
 
 - **PRD §4 FR 表**:在 main 上一次性把所有本批 FR 加行(状态 `计划`)或确认已存在。并行 agent 各自只改"自己那行"的状态(`计划` → `开发中`)。
 - **CHANGELOG 未发布段**:并行 agent 各自把自己的条目**追加在末尾**;不修改其他人加的行。
-- **`docs/specs/<feature>.md`**:每个 FR 一个独立文件,天然不冲突。
+- **`docs/specs/<feature>.md`**:第 3 步已由主控写好并审核通过,**随本步预对齐提交一并落 main**(agent 只读不改);标 `免 spec` 的 FR 不产 spec 文件,agent 也不得自行补写。
 - **ADR 编号预分配**(关键,易踩坑且 git 不会替你报警):并行 agent 各自"看 main 最大 +1"必撞号——更阴的是**不同 slug 的撞号**(如 `0009-auth.md` vs `0009-traffic.md`)**git 会干净合并、不报冲突**,留下两个 ADR-0009。因此**开工前在 main 上确定整批 ADR 号策略**,二选一:
-  - **占位名(推荐)**:并行 agent 一律写 `docs/adr/XXXX-<slug>.md`(标题里也用 `ADR-XXXX`),**真号由本技能在 §7/§8 落地那一刻按入 main 顺序统一分配**。最简单,零撞号风险。
+  - **占位名(推荐)**:并行 agent 一律写 `docs/adr/XXXX-<slug>.md`(标题里也用 `ADR-XXXX`),**真号由本技能在 §8/§9 落地那一刻按入 main 顺序统一分配**。最简单,零撞号风险。
   - **预留号**:本技能开工前看 main 最大号(如 `0008`),按计划顺序预留(`FR-9→0009 / FR-10→0010 / FR-11→0011`),写进 `.tmp/parallel-plan-<日期>.md`,**每个 agent 提示词里把它分到的号写死**,绝不准自己算。
 
-> 这步预对齐由本技能在主仓库做一次中文提交(`docs(prd): 预登记 FR-9/10/11 待并行开发`),不直接派给 worktree agent。
+> 这步预对齐由本技能在主仓库做一次中文提交(`docs(prd): 预登记 FR-9/10/11 + 落盘已审 spec 待并行开发`),把 PRD 预登记行**和第 3 步审核通过的 spec 一起**提交到 main,不直接派给 worktree agent。
 
-### 4. 创建 worktree
+### 5. 创建 worktree
+
+**创建前自验**:`git ls-files docs/specs/ | grep <feature>` 确认第 3 步审核通过的 spec 已在 main 树里——worktree 是 `<main 分支>` 的快照,spec 没落 main 则 agent 进 worktree 读不到、会卡住或违 §3 自行补写。
 
 对第一批每个 FR:
 - 分支命名:`feature/fr-<编号>-<slug>`(slug 来自 FR 简述,英文 kebab-case)
@@ -78,7 +100,7 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 - 命令:`git worktree add <path> -b <branch> <main 分支>`
 - 创建后 `git worktree list` 自验
 
-### 5. spawn 并行 agent(每个 worktree 一个)
+### 6. spawn 并行 agent(每个 worktree 一个)
 
 每个 agent 的提示词模板:
 
@@ -88,7 +110,9 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 
 请按 sdd-develop-feature 全流程走:
 1. 读 docs/PRD.md(关注 FR-X 那行)、docs/ARCHITECTURE.md、相关 docs/adr/
-2. 非平凡功能:复制 docs/specs/_template.md 到 docs/specs/<feature>.md 写规格
+2. spec: <主控判定结果>
+   - 需 spec → 主控已写好并审核通过的 spec 在 `docs/specs/<feature>.md`，**先读再执行**，严格按 spec 的任务拆分和验收标准推进
+   - 免 spec → 跳过
 3. PRD §4 把 FR-X 状态从「计划」翻成「开发中」(只改这一行,不动其他人加的行)
 4. 涉及架构决策:写新 ADR 文件,**编号严格按主控分配**——**禁止自己算"max+1"**(并行下必撞,且不同 slug 时 git 不报警,会静默留两个同号):
    - 若主控分配的是**占位名策略**:文件名用 `docs/adr/XXXX-<slug>.md`、标题写 `# ADR-XXXX`,真号由主控落地时统一替换;
@@ -110,20 +134,20 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 - agent 跑在各自 worktree(用 `cd <worktree>` 或工具支持的 cwd 切换)
 - 不要让 agent 自己 `git push` / `git rebase` / 改 worktree 路径
 
-### 6. 并行结束收集
+### 7. 并行结束收集
 
 所有 agent 返回后:
 - 汇总每个 FR 的状态、证据、触碰文件清单到 `.tmp/parallel-plan-<日期>.md` 的"执行结果"段
 - 标出 `done` / `partial` / `blocked` / `谎报完成`(证据不足或测试未真绿) 
 - **未过完成判据的** → 路由到 `sdd-fix-bug` 接手(不阻塞其他 worktree 进入 rebase)
-- **若用预留号策略**:逐 worktree 验证 ADR 文件名 / 标题用的就是分配号,**不准擅自换号**;有偏差立即纠正再进 §7。
+- **若用预留号策略**:逐 worktree 验证 ADR 文件名 / 标题用的就是分配号,**不准擅自换号**;有偏差立即纠正再进 §8。
 - **若用占位名策略**:确认所有新 ADR 都是 `XXXX-<slug>.md`(没有 agent 偷偷算成 `00NN`)。
 
-### 7. 按确认的集成方式整合到主分支(rebase 或 merge)
+### 8. 按确认的集成方式整合到主分支(rebase 或 merge)
 
 并行结束 → 主控会话统一做(不让 agent 各自整合避免竞态)。**用哪种方式以第 2 步用户确认的"集成方式"为准;用户没确认就别动手整合,回去补问。**
 
-**7.0 整合前必做:备份 main 与所有待整合分支(防整合搞坏无法回滚)**
+**8.0 整合前必做:备份 main 与所有待整合分支(防整合搞坏无法回滚)**
 
 整合那步——**rebase 会重写分支历史、merge 会给 main 加合并提交**——即便 git 没报冲突,也可能"成功但语义搞坏"。所以**动 rebase/merge 之前,先给 main 和每个待整合分支建备份分支,并把 SHA 记进计划文件**,这样任何一步出问题都能**一键还原**,不依赖会过期、看着也乱的 reflog:
 
@@ -150,7 +174,7 @@ git fetch                                  # 拉 main 最新
   cd <worktree>
   git rebase <main>
   冲突 → git rebase --abort（不强推、不 --force），报告冲突文件、问用户
-  无冲突 → rebase 完成,留在 worktree(分支已在 main 之上,§8 可 fast-forward 落地)
+  无冲突 → rebase 完成,留在 worktree(分支已在 main 之上,§9 可 fast-forward 落地)
 ```
 
 **若选 `merge`(保留合并历史):**
@@ -160,11 +184,11 @@ git fetch
   cd <worktree>
   git merge <main>          # 把 main 的新提交并入本分支,消除基线漂移
   冲突 → git merge --abort，报告冲突文件、问用户（禁止 -X ours/theirs 自动蒙混）
-  无冲突 → 合并完成,留在 worktree(§8 用 --no-ff 落地保留分支结构)
+  无冲突 → 合并完成,留在 worktree(§9 用 --no-ff 落地保留分支结构)
 ```
 
 冲突常见来源:
-- PRD §4 同行被多 agent 改(本应被第 3 步预对齐避免,若仍冲突 = 预对齐没做透)
+- PRD §4 同行被多 agent 改(本应被第 4 步预对齐避免,若仍冲突 = 预对齐没做透)
 - CHANGELOG 段尾顺序(多 agent 同时追加)
 - **ADR 编号撞号(易漏)**:同号同 slug → git 报冲突,看得见;**同号不同 slug → git 不报、干净合并、静默留下两个同号 ADR**。**整合前/整合后必须主动跑重号检测**(任何一种集成方式都要跑):
   ```
@@ -173,12 +197,12 @@ git fetch
   # 查 XXXX 占位号是否还残留没替(若用占位名策略)
   ls docs/adr/XXXX-*.md 2>/dev/null
   ```
-  若用**占位名策略**:在此处**按入 main 顺序**(rebase 后的提交时序 / merge 的合并时序)给每个占位 ADR 分配真号,并 `git mv XXXX-foo.md NNNN-foo.md` + 改文件内 `ADR-XXXX` 标题 + grep 全仓库追平所有 `XXXX`/旧编号引用(PRD / ARCHITECTURE / 其它 ADR 的"已被取代"链 / CHANGELOG / 代码注释)。
-  若用**预留号策略**且仍撞号:说明哪个 agent 违反了第 5 步指令,先纠正再合;不准默默 `git mv` 蒙混。
+  若用**占位名策略**:在此处**按入 main 顺序**(rebase 后的提交时序 / merge 的合并时序)给每个占位 ADR 分配真号,并 `git mv XXXX-foo.md NNNN-foo.md` + 改文件内 `ADR-XXXX` 标题 + grep 全仓库追平所有 `XXXX`/旧编号引用(PRD / ARCHITECTURE / spec(`docs/specs/*` —— §3 写 spec 时按占位引用的 ADR 在此一并追平) / 其它 ADR 的"已被取代"链 / CHANGELOG / 代码注释)。
+  若用**预留号策略**且仍撞号:说明哪个 agent 违反了第 6 步指令,先纠正再合;不准默默 `git mv` 蒙混。
 
 **冲突原则(rebase / merge 都适用)**:本技能**不强推、不自动解冲突**(不 `--force`、不删除提交、不 `git checkout .`、不 `-X ours/theirs`),把冲突文件列给用户、问处理方式。**ADR 重号一律以重号检测命令为准,不能依赖 git 状态。**
 
-### 8. 落地到 main(不自动)
+### 9. 落地到 main(不自动)
 
 本技能**默认不落地**,产出一份"合并队列"给用户。**落地方式跟随第 2 步选定的集成方式,不在这里临时改口:**
 - **rebase 路线** → 各分支已在 main 之上,落地用 fast-forward(`git merge --ff-only feature/...`),主分支线性、无多余合并提交。
@@ -196,12 +220,12 @@ git fetch
 - 等下一轮 `sdd-accept-phase` 整期验收再落地
 - 留作 PR 走 review
 
-### 9. 清理 worktree
+### 10. 清理 worktree
 
 用户确认合完后:
 - `git worktree remove <path>`(每个)
 - 分支可保留也可 `git branch -d`(已合且无引用)
-- **§7.0 的备份分支**(及 bundle 档,若有):**确认整批落地无误、用户点头后才删**(`git branch -D backup/*-pre-integrate-<日期戳>`;bundle 直接删文件);用户想留作历史就别删。删早了就失去回滚锚点了。
+- **§8.0 的备份分支**(及 bundle 档,若有):**确认整批落地无误、用户点头后才删**(`git branch -D backup/*-pre-integrate-<日期戳>`;bundle 直接删文件);用户想留作历史就别删。删早了就失去回滚锚点了。
 
 ## 与其他技能的关系
 
@@ -213,11 +237,11 @@ git fetch
 ## 注意事项
 
 - **并行 ≠ 越多越好**:默认上限 4;3~5 个 FR 时收益明显,>6 后管理失控,建议拆批做。
-- **共享文件预对齐**:见第 3 步——PRD §4 / CHANGELOG / .claude/rules/* 这类全局文件预先在 main 调好。
+- **共享文件预对齐**:见第 4 步——PRD §4 / CHANGELOG / .claude/rules/* 这类全局文件预先在 main 调好。
 - **跨 worktree 共享改动只在 main 改**:不要在某个 worktree 内改 `.claude/rules/` 然后期望它"扩散"到其他 worktree。
 - **依赖有疑虑时,转串行**:不确定 FR-A 是否依赖 FR-B → 串行(`sdd-develop-feature` 单跑)比并行翻车安全。
 - **真机维度的预算**:每个并行 FR 都要真机过 → 提前规划真机环境承载力(如只有一套测试集群,FR-9 真机和 FR-10 真机会互踩)。
 
 ## 红线
 
-跳过依赖分析就并行 · 没拿用户授权擅自 `git worktree` · **没问用户集成方式(rebase / merge)就开工** · **不问就默认 / 擅自用 merge(或 rebase)整合** · agent 报"完成了"不出示证据就整合 · 自动 push / 自动合 main · 冲突用 `--force`、`-X ours/theirs` 或丢弃提交强推 / 自动蒙混 · 并行超过用户确认的上限 · 在 worktree 改全局文件期望"扩散" · 用本技能"塞"单个 FR(直接 `sdd-develop-feature` 即可,不要为加 worktree 而加) · **让并行 agent 各自"max+1"写 ADR 编号** · **整合前后不跑 ADR 重号检测**(git 不会替你报 ADR 静默撞号)· **整合前不给 main 与分支建备份(分支)就 rebase/merge**(出问题无锚点可回滚)· 没等用户确认整批落地无误就删备份分支。
+跳过依赖分析就并行 · 没拿用户授权擅自 `git worktree` · **没问用户集成方式(rebase / merge)就开工** · **不问就默认 / 擅自用 merge(或 rebase)整合** · **凭感觉判断"简不简单"绕过 spec-checklist** · **spec 未全部审核通过就创建 worktree / spawn agent** · **让 agent 自己写 spec 而不前置统一审核** · **审核通过的 spec 没落 main 就创建 worktree(agent 读不到 spec)** · agent 报"完成了"不出示证据就整合 · 自动 push / 自动合 main · 冲突用 `--force`、`-X ours/theirs` 或丢弃提交强推 / 自动蒙混 · 并行超过用户确认的上限 · 在 worktree 改全局文件期望"扩散" · 用本技能"塞"单个 FR(直接 `sdd-develop-feature` 即可,不要为加 worktree 而加) · **让并行 agent 各自"max+1"写 ADR 编号** · **整合前后不跑 ADR 重号检测**(git 不会替你报 ADR 静默撞号)· **整合前不给 main 与分支建备份(分支)就 rebase/merge**(出问题无锚点可回滚)· 没等用户确认整批落地无误就删备份分支。
