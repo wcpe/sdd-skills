@@ -6,7 +6,7 @@
 
 除技能外，本插件给 **Claude Code** 还捆绑三类组件（**仅 Claude Code 生效**；Codex / opencode 只用 `skills/`、能力优雅降级）：
 
-- **斜杠命令** `commands/`：`/sdd`（工作流路由）、`/sdd-status`（读 PRD FR 表汇报状态 + 漂移）、`/sdd-feature`、`/sdd-fix`、`/sdd-accept`、`/sdd-release`——把常用工作流变成 `/` 菜单里的快捷入口。
+- **斜杠命令** `commands/`（**每个 sdd-* 工作流都配一条**，`/` 菜单即 SDD 工作流面板）：`/sdd` 路由 + `/sdd-status`（读 PRD FR 表汇报状态 + 漂移）+ 全工作流快捷入口 `/sdd-brainstorm` `/sdd-feature` `/sdd-fix` `/sdd-refactor` `/sdd-review` `/sdd-accept` `/sdd-release` `/sdd-docs` `/sdd-hotfix` `/sdd-rollback` `/sdd-snapshot` `/sdd-bump` `/sdd-realign` `/sdd-parallel` `/sdd-reconcile` `/sdd-governance` `/sdd-init` `/sdd-retrofit`。
 - **防漂移护栏 hook** `hooks/`（**只在 SDD 项目里生效**，检测到 `docs/PRD.md` + `.claude/rules/` 才动）：
   - **提交门**——拦 AI 署名 / 阶段词（Phase·MVP·Sprint·P0…）/ 非 Conventional Commits / 非中文描述，阻断不合规 commit；
   - **ADR 不可变提醒**——改「已接受」ADR 决策正文时提醒写新 ADR 取代；
