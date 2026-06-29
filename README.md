@@ -1,6 +1,19 @@
 # SDD Skills
 
-一套「规格驱动开发（SDD, Spec-Driven Development）」的 AI 编码技能集：**2 个脚手架技能** + **16 个 `sdd-*` 迭代技能** + 一套可复用模板。同一套 `SKILL.md` 通用于 **Claude Code**（插件一键装全部）、**OpenAI Codex** 与 **opencode**。让项目**规格先行、文档即代码、跨会话不漂移**。沉淀自实战项目的治理实践。
+一套「规格驱动开发（SDD, Spec-Driven Development）」的 AI 编码技能集：**2 个脚手架技能** + **16 个 `sdd-*` 迭代技能** + 一套可复用模板。同一套 `SKILL.md` 通用于 **Claude Code**（插件一键装全部）、**OpenAI Codex** 与 **opencode**；Claude Code 下还捆绑斜杠命令 / 防漂移护栏 hook / MCP 工具（见下「Claude Code 专属增强」）。让项目**规格先行、文档即代码、跨会话不漂移**。沉淀自实战项目的治理实践。
+
+## Claude Code 专属增强（v0.10.0）
+
+除技能外，本插件给 **Claude Code** 还捆绑三类组件（**仅 Claude Code 生效**；Codex / opencode 只用 `skills/`、能力优雅降级）：
+
+- **斜杠命令** `commands/`：`/sdd`（工作流路由）、`/sdd-status`（读 PRD FR 表汇报状态 + 漂移）、`/sdd-feature`、`/sdd-fix`、`/sdd-accept`、`/sdd-release`——把常用工作流变成 `/` 菜单里的快捷入口。
+- **防漂移护栏 hook** `hooks/`（**只在 SDD 项目里生效**，检测到 `docs/PRD.md` + `.claude/rules/` 才动）：
+  - **提交门**——拦 AI 署名 / 阶段词（Phase·MVP·Sprint·P0…）/ 非 Conventional Commits / 非中文描述，阻断不合规 commit；
+  - **ADR 不可变提醒**——改「已接受」ADR 决策正文时提醒写新 ADR 取代；
+  - **文档同步提醒**——会话末暂存了代码却没改文档时提醒 doc-sync。
+
+  把 `.claude/rules/` 从"文档劝说"硬化成"机器护栏"——正是 SDD「防漂移」的落地。
+- **MCP 工具** `mcp/`：`sdd_check_drift`——一次调用解析 PRD FR 表、对照 git tag / CHANGELOG，返回 FR 状态 + 漂移清单。
 
 ## 脚手架技能（一次性套上 SDD）
 
