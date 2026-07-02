@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Refactor Code"
+  short_description: "Refactor code while preserving behavior, tests, and SDD documentation consistency."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-refactor-code to refactor this code without changing behavior."

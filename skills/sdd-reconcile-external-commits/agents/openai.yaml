@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Reconcile External Commits"
+  short_description: "Backfill specs and docs from commits that bypassed the normal SDD workflow."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-reconcile-external-commits to reconcile these external commits with SDD docs."

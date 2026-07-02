@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Hotfix"
+  short_description: "Handle urgent production fixes with constrained scope and patch-release discipline."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-hotfix to manage this urgent production fix."

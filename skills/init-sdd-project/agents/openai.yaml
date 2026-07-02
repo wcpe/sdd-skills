@@ -1,0 +1,5 @@
+interface:
+  display_name: "Init SDD Project"
+  short_description: "Initialize a new project with SDD docs, rules, templates, and workflow structure."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $init-sdd-project to initialize this project with an SDD structure."

@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Release Version"
+  short_description: "Prepare a formal version release with tag, changelog, version bump, and FR delivery state."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-release-version to prepare this formal SDD release."

@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Parallel Develop"
+  short_description: "Coordinate multiple independent FRs with dependency checks and parallel execution."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-parallel-develop to plan and coordinate these independent SDD features."

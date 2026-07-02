@@ -7,5 +7,26 @@
   },
   "homepage": "https://github.com/wcpe/sdd-skills",
   "repository": "https://github.com/wcpe/sdd-skills",
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "SDD Skills",
+    "shortDescription": "规格驱动开发技能集，覆盖项目初始化、迭代、修复、发布与治理同步。",
+    "longDescription": "SDD Skills 为 Codex 提供 18 个规格驱动开发技能，包括 init-sdd-project、retrofit-to-sdd，以及需求拆解、功能开发、缺陷修复、重构、发布、文档同步、代码审查和治理同步等 sdd-* 工作流。",
+    "developerName": "wcpe",
+    "category": "Productivity",
+    "capabilities": [
+      "Spec-driven development workflows",
+      "Project scaffolding",
+      "Documentation governance",
+      "MCP drift checks",
+      "Workflow-specific Codex skill cards"
+    ],
+    "websiteURL": "https://github.com/wcpe/sdd-skills",
+    "brandColor": "#2F6FED",
+    "composerIcon": "assets/sdd-skills.svg",
+    "logo": "assets/sdd-skills.svg",
+    "logoDark": "assets/sdd-skills.svg",
+    "defaultPrompt": "Use SDD Skills to help me run a spec-driven development workflow."
+  }
 }

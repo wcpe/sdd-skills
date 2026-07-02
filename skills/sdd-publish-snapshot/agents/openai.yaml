@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Publish Snapshot"
+  short_description: "Publish a non-final snapshot build without marking FRs as officially delivered."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-publish-snapshot to prepare a development snapshot release."

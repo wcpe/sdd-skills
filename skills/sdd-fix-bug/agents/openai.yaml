@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Fix Bug"
+  short_description: "Fix a defect through reproduction, tests, implementation, and documentation sync."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-fix-bug to reproduce and fix this bug in the SDD workflow."

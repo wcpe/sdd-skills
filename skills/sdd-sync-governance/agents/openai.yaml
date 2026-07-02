@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Sync Governance"
+  short_description: "Merge upstream SDD governance template changes into an existing project safely."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-sync-governance to sync upstream SDD governance into this project."

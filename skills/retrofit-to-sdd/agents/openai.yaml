@@ -1,0 +1,5 @@
+interface:
+  display_name: "Retrofit To SDD"
+  short_description: "Convert an existing repository into an SDD-governed project without changing business code."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $retrofit-to-sdd to analyze this existing repository and add SDD governance."

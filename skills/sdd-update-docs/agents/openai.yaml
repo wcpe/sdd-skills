@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Update Docs"
+  short_description: "Make pure documentation updates in an SDD project without pretending code changed."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-update-docs to update this SDD documentation."

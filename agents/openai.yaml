@@ -1,0 +1,7 @@
+interface:
+  display_name: "SDD Skills"
+  short_description: "Run spec-driven development workflows across planning, implementation, review, release, and governance."
+  icon_small: "./assets/sdd-skills.svg"
+  icon_large: "./assets/sdd-skills.svg"
+  brand_color: "#2F6FED"
+  default_prompt: "Use SDD Skills to guide this project through a spec-driven development workflow."

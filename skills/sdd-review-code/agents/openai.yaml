@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Review Code"
+  short_description: "Review code changes for correctness, risk, quality, and SDD compliance."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-review-code to review this code in the SDD workflow."

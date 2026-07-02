@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Bump Dependencies"
+  short_description: "Upgrade dependencies inside an SDD project with tests, changelog, and risk checks."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-bump-dependencies to plan and verify this dependency upgrade."

@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Realign PRD"
+  short_description: "Diagnose PRD structure or status drift and produce a repair plan."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-realign-prd to diagnose and realign this PRD."

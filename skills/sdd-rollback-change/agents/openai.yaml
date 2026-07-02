@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Rollback Change"
+  short_description: "Rollback a change or release while keeping specs, changelog, and state aligned."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-rollback-change to plan and execute this rollback."

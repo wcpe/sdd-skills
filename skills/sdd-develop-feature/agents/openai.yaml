@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Develop Feature"
+  short_description: "Implement a planned SDD feature while keeping specs, tests, and docs synchronized."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-develop-feature to implement this SDD feature."

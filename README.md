@@ -1,19 +1,14 @@
 # SDD Skills
 
-一套「规格驱动开发（SDD, Spec-Driven Development）」的 AI 编码技能集：**2 个脚手架技能** + **16 个 `sdd-*` 迭代技能** + 一套可复用模板。同一套 `SKILL.md` 通用于 **Claude Code**（插件一键装全部）、**OpenAI Codex** 与 **opencode**；Claude Code 下还捆绑斜杠命令 / 防漂移护栏 hook / MCP 工具（见下「Claude Code 专属增强」）。让项目**规格先行、文档即代码、跨会话不漂移**。沉淀自实战项目的治理实践。
+一套「规格驱动开发（SDD, Spec-Driven Development）」的 AI 编码技能集：**2 个脚手架技能** + **16 个 `sdd-*` 迭代技能** + 一套可复用模板。同一套 `SKILL.md` 通用于 **Claude Code**（插件一键装全部）、**OpenAI Codex** 与 **opencode**；Claude Code 下捆绑斜杠命令 / 防漂移护栏 hook / MCP 工具，Codex 下捆绑插件展示元数据 / workflow skill cards / MCP 漂移审计工具。让项目**规格先行、文档即代码、跨会话不漂移**。沉淀自实战项目的治理实践。
 
-## Claude Code 专属增强（v0.10.0）
+## 插件能力
 
-除技能外，本插件给 **Claude Code** 还捆绑三类组件（**仅 Claude Code 生效**；Codex / opencode 只用 `skills/`、能力优雅降级）：
+除通用 `skills/` 外，本仓库同时带 Claude Code 与 Codex 的插件入口。Claude Code 通过 `.claude-plugin/plugin.json` 加载斜杠命令、防漂移 hook 与 MCP 工具；Codex 通过 `.codex-plugin/plugin.json` 加载插件展示元数据、workflow skill cards、展示资产与 MCP 工具。两边共用同一套 `SKILL.md` 和同一个 `mcp/sdd-mcp.mjs`，但平台专属能力不混用：Claude 的 `commands/` 与 `hooks/` 不会在 Codex 下启用，Codex 的 `agents/openai.yaml` 与 `skills/*/agents/openai.yaml` 只服务 Codex 展示与默认提示。
 
-- **斜杠命令** `commands/`（**每个 sdd-* 工作流都配一条**，`/` 菜单即 SDD 工作流面板）：`/sdd` 路由 + `/sdd-status`（读 PRD FR 表汇报状态 + 漂移）+ 全工作流快捷入口 `/sdd-brainstorm` `/sdd-feature` `/sdd-fix` `/sdd-refactor` `/sdd-review` `/sdd-accept` `/sdd-release` `/sdd-docs` `/sdd-hotfix` `/sdd-rollback` `/sdd-snapshot` `/sdd-bump` `/sdd-realign` `/sdd-parallel` `/sdd-reconcile` `/sdd-governance` `/sdd-init` `/sdd-retrofit`。
-- **防漂移护栏 hook** `hooks/`（**只在 SDD 项目里生效**，检测到 `docs/PRD.md` + `.claude/rules/` 才动）：
-  - **提交门**——拦 AI 署名 / 阶段词（Phase·MVP·Sprint·P0…）/ 非 Conventional Commits / 非中文描述，阻断不合规 commit；
-  - **ADR 不可变提醒**——改「已接受」ADR 决策正文时提醒写新 ADR 取代；
-  - **文档同步提醒**——会话末暂存了代码却没改文档时提醒 doc-sync。
-
-  把 `.claude/rules/` 从"文档劝说"硬化成"机器护栏"——正是 SDD「防漂移」的落地。
-- **MCP 工具** `mcp/`：`sdd_check_drift`——一次调用解析 PRD FR 表、对照 git tag / CHANGELOG，返回 FR 状态 + 漂移清单。
+- **Claude Code**：`commands/` 提供 `/sdd` 路由、`/sdd-status` 以及所有 workflow 快捷入口；`hooks/` 提供提交门、ADR 不可变提醒、文档同步提醒；`.mcp.json` 暴露 `sdd_check_drift`。
+- **OpenAI Codex**：`.codex-plugin/plugin.json`、`agents/openai.yaml`、`assets/` 和 `skills/*/agents/openai.yaml` 提供插件页、图标、能力说明、workflow skill cards 与默认 prompt；`.mcp.json` 暴露 `sdd_check_drift`。
+- **opencode**：使用通用 `skills/`，不加载 Claude/Codex 插件专属增强。
 
 ## 脚手架技能（一次性套上 SDD）
 
@@ -87,7 +82,17 @@ CLI 等价：`claude plugin marketplace add wcpe/claude-plugins` / `claude plugi
 
 ### OpenAI Codex
 
-Codex 原生认 `SKILL.md`。最稳的装法是把技能放进 Codex 的技能目录（无需任何清单）：
+本插件也收录在 **wcpe Codex 插件市场**（[wcpe/codex-plugins](https://github.com/wcpe/codex-plugins)，本地开发仓库位于 `D:\Projects\codex-plugins`）。Codex 插件模式会额外启用展示元数据、workflow skill cards 与 `sdd_check_drift` MCP 工具。
+
+本地开发时：
+
+```bash
+codex plugin marketplace add D:\Projects\codex-plugins
+```
+
+添加市场后，在 Codex 插件界面安装 `sdd-skills@wcpe`。如果使用远端仓库分发，则把 marketplace 指向 `wcpe/codex-plugins`。
+
+如果只想使用技能正文，也可以把技能放进 Codex 的技能目录：
 
 ```
 git clone https://github.com/wcpe/sdd-skills
@@ -95,7 +100,7 @@ cp -r sdd-skills/skills/* ~/.codex/skills/          # 全局：所有项目可�
 # 或仅当前项目：拷进 <项目>/.codex/skills/
 ```
 
-本仓库也带了 `.codex-plugin/plugin.json`，若你的 Codex 版本支持插件系统，可 `/plugin marketplace add wcpe/claude-plugins` + `/plugin install sdd-skills@wcpe` 安装（随版本而定，以目录安装为准）。
+插件模式优先，因为它能同时带上 `.mcp.json`、`agents/openai.yaml` 与展示资产。
 
 ### opencode
 
@@ -112,11 +117,13 @@ cp -r sdd-skills/skills/* ~/.config/opencode/skills/   # 全局：所有项目�
 ## 仓库结构
 
 ```
-sdd-skills/                         ← 仓库根 = 插件本体（分发经 wcpe 组织市场 wcpe/claude-plugins）
+sdd-skills/                         ← 仓库根 = 插件本体（Claude 经 wcpe/claude-plugins，Codex 经 wcpe/codex-plugins）
 ├── .claude-plugin/                 Claude Code 插件清单
 │   └── plugin.json
 ├── .codex-plugin/                  Codex 插件清单
-│   └── plugin.json                 skills 指向 ./skills/
+│   └── plugin.json                 skills 指向 ./skills/，MCP 指向 ./.mcp.json
+├── agents/                         Codex 插件级展示元数据
+├── assets/                         Codex 插件图标与展示资源
 ├── skills/                         所有技能（SKILL.md，三种工具通用；opencode 靠目录发现）
 │   ├── init-sdd-project/
 │   │   ├── SKILL.md
