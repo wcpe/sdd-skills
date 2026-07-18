@@ -9,7 +9,7 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 
 **不动业务代码、不改行为。** 逆向改造只**新增治理文档/规则/技能**，从既有代码反向提取"现状真相"，让以后的迭代有规可循。第一版文档要**忠于代码现状**，不是"你希望它变成的样子"——理想与现状的差距记成待办，不在这次顺手改。
 
-模板在本技能目录的 **`templates/`** 下（插件安装后其绝对路径为 `${CLAUDE_PLUGIN_ROOT}/skills/retrofit-to-sdd/templates/`；下文 `templates/` 均指此处）。
+本技能**不自带模板副本**，统一复用唯一权威模板源 `skills/init-sdd-project/templates/`。Claude Code 使用 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/`；Codex 与 opencode 的技能目录保持同级安装时使用 `../init-sdd-project/templates/`。下文“权威模板”均指该目录。
 
 ## 强制流程
 
@@ -25,10 +25,10 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 - **`docs/adr/`**：把代码里**已经成立的重大决策**补记为 ADR（选了什么框架/为何这样分层/关键取舍），状态写 `已接受`、背景注明"现状追认"。**只追认重大的**，别给每个细节写 ADR（会滥用）。
 - **`.claude/rules/architecture-invariants.md`**：把现有代码**事实上的边界与禁忌**固化为不变量（据现状，不是空想）。
 
-### 3. 安装通用治理（从 `templates/` 拷贝，按本项目替换占位符）
-同 `init-sdd-project` 第 3 步：
-- `templates/claude-rules/*` → `.claude/rules/`。迭代技能**不拷入项目**——`sdd-*` 技能随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装。
-- `templates/docs/{CONTRIBUTING, adr/README, specs/*}` → `docs/`；`templates/github/*`、`editorconfig.txt`、按栈选 `.gitignore`。
+### 3. 安装通用治理（从权威模板拷贝，按本项目替换占位符）
+同 `init-sdd-project` 第 3 步，所有来源都指向 `skills/init-sdd-project/templates/`：
+- 权威模板的 `claude-rules/*` → `.claude/rules/`。迭代技能**不拷入项目**——`sdd-*` 技能随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装。
+- 权威模板的 `docs/{CONTRIBUTING, adr/README, specs/*}` → `docs/`；`github/*`、`editorconfig.txt`、按栈选 `.gitignore`。
 - 补 `CHANGELOG.md` / `VERSION` / `SECURITY.md` / `docs/OPERATIONS.md` 骨架（据现状填）。
 - **`.gitignore` 已含 `/.tmp/` 等**——若项目已有 `.gitignore`，是合并不是覆盖。
 - 写 `.claude/rules/.sdd-version` 记来源戳（当前 sdd-skills 版本，读 `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` 的 `version`，是 git 检出再附 `commit`）+ 日期 + 来源技能，供 `sdd-sync-governance` 日后增量升级治理用。

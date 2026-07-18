@@ -14,7 +14,7 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 - **流程**：`.claude/rules`（防漂移红线，装进项目）+ `sdd-*` 迭代技能（开发/修复/重构/回滚/发布/快照/热修/依赖/文档，随本 `sdd-skills` 插件一同提供，所有 SDD 项目共享、`/plugin update` 一次更新全项目生效）。
 - **工程化**：`VERSION` + 发布渠道、分支模型 + PR/Issue 模板、运维/安全/许可、静态检查。
 
-模板在本技能目录的 **`templates/`** 下（插件安装后其绝对路径为 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/`；下文 `templates/` 均指此处）。本技能的工作是：**问清项目 → 用模板生成"项目特定"的规格 → 安装"通用"的防漂移规则 → 配好 git/版本/许可**（`sdd-*` 迭代技能随本插件一同提供，无需单独安装）。
+**`skills/init-sdd-project/templates/` 是本仓库唯一权威模板源**，其他脚手架技能只引用它，不维护副本。Claude Code 插件安装后的绝对路径为 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/`；Codex 与 opencode 按技能同级目录使用 `../init-sdd-project/templates/`。下文 `templates/` 均指这一权威目录。本技能的工作是：**问清项目 → 用模板生成"项目特定"的规格 → 安装"通用"的防漂移规则 → 配好 git/版本/许可**（`sdd-*` 迭代技能随本插件一同提供，无需单独安装）。
 
 ## 强制流程
 

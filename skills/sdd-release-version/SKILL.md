@@ -7,7 +7,7 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。发布
 
 ## 核心原则
 
-发版 tag 必须指向"版本号、CHANGELOG、文档、可交付物构建结果全部一致"的本地提交。触发本技能即表示允许创建**本地** release commit 和本地 tag，但**永远不含远程 push 授权**。
+发版 tag 必须指向“版本号、CHANGELOG、文档、可交付物构建结果全部一致”的本地提交。触发本技能即表示允许在全部既有逻辑提交之后追加**独立**的本地 release commit 和本地附注 tag，但**永远不含远程 push 授权**。详细、通用的提交历史治理规范以项目 `.claude/rules/git-commit.md` 为准，本技能只规定发版所需动作，不复制整套规则。
 
 可交付物：本项目的构建产物 / 镜像 / 制品等，以项目实际为准（构建 / 测试命令见 `docs/OPERATIONS.md` / README 构建章节，或项目约定）。
 
@@ -42,9 +42,10 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。发布
 - 再次构建全部可交付物、测试全绿，tag 指向这次最终态。
 - `git diff` 自审：只含版本、CHANGELOG、必要文档；不含 `.tmp/`、过程稿、凭据。
 
-### 7. 提交与打 tag
-- 只暂存相关文件（禁 `git add .` 式全量）；中文提交 `chore(release): 发布 vX.Y.Z`。
-- 创建本地附注 tag：`git tag -a vX.Y.Z -m "发布 vX.Y.Z"`，报告 commit 与 tag 名。
+### 7. 追加独立 release 提交并打 tag
+- 只暂存版本、CHANGELOG 与必要文档（禁 `git add .` 式全量），在此前逻辑提交之后新增一个**独立**的 `chore(release): 发布 X.Y.Z` 提交；该提交只承载发版定稿，不混入此前应独立存在的功能、修复或重构。
+- **不得通过 `rebase`、`squash` 或 `amend` 重写此前任何逻辑提交，也不得把整个版本压成单个提交。** 发版流程只追加 release 提交，不整理、归并或替换既有逻辑历史。
+- 在该 release 提交上创建本地附注 tag：`git tag -a vX.Y.Z -m "发布 vX.Y.Z"`，报告 commit 与 tag 名。
 - **禁止任何 `git push` / `git push --tags`。** 推送由用户决定。
 
 ## 红线

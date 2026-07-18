@@ -112,7 +112,7 @@ cp -r sdd-skills/skills/* ~/.config/opencode/skills/   # 全局：所有项目�
 # 或仅当前项目：拷进 <项目>/.opencode/skills/（或 .claude/skills/）
 ```
 
-> Windows 用 `Copy-Item sdd-skills\skills\* <目标> -Recurse`。脚手架技能自带的 `templates/` 随技能目录一起拷贝，其引用为「本技能目录下的 `templates/`」，三种工具都能定位（Claude Code 下另用 `${CLAUDE_PLUGIN_ROOT}` 绝对寻址）。
+> Windows 用 `Copy-Item sdd-skills\skills\* <目标> -Recurse`。`skills/init-sdd-project/templates/` 是唯一权威模板源，安装时必须让 `init-sdd-project` 与 `retrofit-to-sdd` 保持同级：Claude Code 通过 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/` 定位，Codex 与 opencode 通过 `../init-sdd-project/templates/` 复用同一目录。
 
 ## 仓库结构
 
@@ -127,10 +127,9 @@ sdd-skills/                         ← 仓库根 = 插件本体（Claude 经 wc
 ├── skills/                         所有技能（SKILL.md，三种工具通用；opencode 靠目录发现）
 │   ├── init-sdd-project/
 │   │   ├── SKILL.md
-│   │   └── templates/              脚手架自带模板：claude-rules · docs 骨架 · github · gitignore · licenses · VERSION
+│   │   └── templates/              唯一权威模板源：claude-rules · docs 骨架 · github · gitignore · licenses · VERSION
 │   ├── retrofit-to-sdd/
-│   │   ├── SKILL.md
-│   │   └── templates/              同上（各自带一份，自包含）
+│   │   └── SKILL.md                复用 ../init-sdd-project/templates/，不维护模板副本
 │   ├── sdd-brainstorming/SKILL.md         ┐
 │   ├── sdd-develop-feature/SKILL.md       │
 │   ├── sdd-fix-bug/SKILL.md               │
@@ -239,7 +238,7 @@ sdd-skills/                         ← 仓库根 = 插件本体（Claude 经 wc
       ③ CHANGELOG 未发布段 → ## 0.1.0（YYYY-MM-DD）
       ④ PRD §4 把交付的 FR 状态翻成「已交付@v0.1.0」（保留不删）
       ⑤ 更新根 VERSION
-      ⑥ 中文提交 chore(release): 发布 v0.1.0
+      ⑥ 中文提交 chore(release): 发布 0.1.0
       ⑦ 打本地 tag v0.1.0（不 push，你审完手动推）
 
                               │
