@@ -15,7 +15,7 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。当 sd
 
 ## 适用边界
 
-- **能干净同步**（通用正文，随上游走）：`.claude/rules/README.md` 与 `.claude/rules/` 里除 `architecture-invariants.md` 外的规则（`testing-and-quality` 除 §2 高风险区），包括 `git-commit` / `doc-sync` / `decision-alignment` / `scope-discipline` / `comments` / `config-files` / `static-analysis`，以及 `docs/CONTRIBUTING.md`、`docs/specs/_template.md`、`docs/adr/_template.md`。
+- **能干净同步**（通用正文，随上游走）：`.claude/rules/README.md` 与 `.claude/rules/` 里除 `architecture-invariants.md` 外的规则（`testing-and-quality` 除 §2 高风险区），包括 `git-commit` / `doc-sync` / `decision-alignment` / `scope-discipline` / `comments` / `config-files` / `test-conventions` / `static-analysis`，以及 `docs/CONTRIBUTING.md`、`docs/specs/_template.md`、`docs/adr/_template.md`。
 - **绝不覆盖**（项目自有）：`architecture-invariants.md`、`testing-and-quality §2 高风险区`、一切 `<...>` 占位的填充处。
 - **只提建议、不自动写**（活在项目自有文档里的治理注记）：如 PRD §4 / §6、ARCHITECTURE 里的约定——这些嵌在项目已填的文档中，本技能只**列出"上游加了这条，建议你也加"**，由用户走 `sdd-update-docs` 自行决定。
 

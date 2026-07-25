@@ -9,9 +9,10 @@
 | [decision-alignment.md](decision-alignment.md) | **决策漂移**：动手前对齐 PRD/架构/ADR，不静默推翻 |
 | [doc-sync.md](doc-sync.md) | **文档漂移**：文档随代码同 PR 更新 |
 | [testing-and-quality.md](testing-and-quality.md) | **质量漂移**：验证门与质量底线 |
+| [test-conventions.md](test-conventions.md) | **测试风格漂移**：测试代码命名 / 中文描述 / 断言消息规范（按语言分节） |
 | [static-analysis.md](static-analysis.md) | **风格漂移**：格式化与静态检查工具链 + CI 门禁 |
 | [comments.md](comments.md) | 注释中文 |
 | [config-files.md](config-files.md) | YAML 配置规范 |
-| [git-commit.md](git-commit.md) | **提交信息规范**、**逻辑提交粒度**、**主线历史整理**与**文档入库边界** |
+| [git-commit.md](git-commit.md) | **提交信息规范**、**逻辑提交粒度**、**主线历史整理**、**文档入库边界**与**禁止擅自开 PR / 破坏性操作** |
 
 > 完整演进与维护流程见 [../../docs/CONTRIBUTING.md](../../docs/CONTRIBUTING.md)。

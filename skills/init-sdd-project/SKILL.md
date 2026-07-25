@@ -35,7 +35,7 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 - `README.md` / `CHANGELOG.md` / `docs/OPERATIONS.md` / `SECURITY.md` / `VERSION` / `LICENSE`：据访谈填实（许可按用户选择，从 `templates/licenses/` 取）。
 
 ### 3. 原样安装通用治理（从 `templates/` 拷贝，仅替换占位符）
-- `templates/claude-rules/*` → `<project>/.claude/rules/`（comments / config-files / git-commit / doc-sync / decision-alignment / scope-discipline / testing-and-quality / static-analysis / README）。
+- `templates/claude-rules/*` → `<project>/.claude/rules/`（comments / config-files / git-commit / doc-sync / decision-alignment / scope-discipline / testing-and-quality / test-conventions / static-analysis / README）。
 - 迭代技能**不拷进项目**：`sdd-brainstorming` / `sdd-develop-feature` / `sdd-fix-bug` / `sdd-refactor-code` / `sdd-rollback-change` / `sdd-hotfix` / `sdd-release-version` / `sdd-publish-snapshot` / `sdd-bump-dependencies` / `sdd-update-docs` / `sdd-reconcile-external-commits` / `sdd-accept-phase` / `sdd-realign-prd` / `sdd-parallel-develop` / `sdd-review-code` / `sdd-sync-governance` 随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装；项目侧不放 `.claude/skills/`。
 - `templates/docs/{CONTRIBUTING.md, adr/README.md, specs/README.md, specs/_template.md}` → `<project>/docs/`。
 - `templates/github/*` → `<project>/.github/`；`templates/editorconfig.txt` → `.editorconfig`；按栈选 `templates/gitignore-templates/<stack>.gitignore` → `.gitignore`。
