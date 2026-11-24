@@ -390,6 +390,10 @@ test('读取根目录 ARCHITECTURE / CONTRIBUTING 的迭代技能兼容旧布局
     const file = path.join(skillsRoot, name, 'SKILL.md');
     const content = readFileSync(file, 'utf8');
     if (!/(?<!docs\/)(ARCHITECTURE|CONTRIBUTING)\.md/.test(content)) continue;
-    assert.match(content, /旧布局兼容/, `${name} 读取根目录文档但缺少旧布局兼容说明`);
+    assert.match(
+      content,
+      /旧布局兼容：`ARCHITECTURE\.md` \/ `CONTRIBUTING\.md` 在仓库根找不到时，读写 `docs\/` 下的同名文件，不擅自迁移/,
+      `${name} 读取根目录文档但缺少回退到 docs/ 的旧布局兼容说明`,
+    );
   }
 });

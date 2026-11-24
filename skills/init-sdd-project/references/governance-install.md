@@ -32,7 +32,7 @@
 一律**合并不覆盖**，先读再写：
 
 - `.gitignore`、`.editorconfig`：保留既有条目，只追加缺失项（至少 `/.tmp/`）。`.gitignore` 里已有 `!` 例外时，新增条目插在会被它覆盖的例外**之前**（后出现的规则优先），追加后用 `git check-ignore -v <例外路径>` 确认例外仍生效。
-- 仓库根或 `docs/` 下已有 `CONTRIBUTING.md` / `ARCHITECTURE.md`：以已有文件为底合并（保留既有流程与约定，模板只补缺失章节），落点统一为仓库根；原在 `docs/` 的经用户确认后 `git mv` 上移，不另建第二份。上移时双向修正相对链接：被移动文档内的每条相对链接先按原目录 `docs/` 解析出目标，再按仓库根重新生成（如 `specs/README.md` → `docs/specs/README.md`、`../.claude/rules/git-commit.md` → `.claude/rules/git-commit.md`）；README、`docs/adr/README.md`、`.claude/rules/*`、`AGENTS.md`、`.github/` 模板里指向它的入口链接改到新路径；改完逐条确认目标存在。
+- 仓库根或 `docs/` 下已有 `CONTRIBUTING.md` / `ARCHITECTURE.md`：以已有文件为底合并（保留既有流程与约定，模板只补缺失章节），落点统一为仓库根；原在 `docs/` 的经用户确认后 `git mv` 上移，不另建第二份。上移时双向修正相对链接：被移动文档内的每条相对链接先按原目录 `docs/` 解析出目标，再按仓库根重新生成（如 `specs/README.md` → `docs/specs/README.md`、`../.claude/rules/git-commit.md` → `.claude/rules/git-commit.md`）；其他文件指向它的入口链接改到新路径——上移前用 `git grep -n -e 'ARCHITECTURE\.md' -e 'CONTRIBUTING\.md'` 找出全仓库所有引用，README、`CLAUDE.md`、`AGENTS.md`、`docs/adr/README.md`、`.claude/rules/*`、`.github/` 模板只是常见位置，不是固定范围；改完逐条确认目标存在，并再跑一次同样的 grep，确认没有引用仍解析到 `docs/` 下的旧路径。
 - `README.md`、`CHANGELOG.md`、`SECURITY.md`：保留既有正文，按模板章节补缺失段；既有约定（分支模型、发布方式）与模板冲突时沿用既有约定改写模板段。
 - `.github/` 下已有 PR / Issue 模板：保留既有，模板中缺失的检查项以追加方式补入。
 - `.claude/rules/` 已有同名规则：保留项目内容，模板增量按章节并入；无法判断归属的列入冲突清单问用户。
