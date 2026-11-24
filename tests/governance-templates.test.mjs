@@ -304,3 +304,29 @@ test('关键治理文本使用简体中文且不存在实际 AI 或作者 footer
     'tests/governance-templates.test.mjs',
   );
 });
+
+test('sdd-skills 版本戳文件与插件清单版本一致', () => {
+  const stamp = readRepo('skills', 'init-sdd-project', 'references', 'sdd-skills-version.txt').trim();
+  for (const manifest of ['.claude-plugin', '.codex-plugin']) {
+    const { version } = JSON.parse(readRepo(manifest, 'plugin.json'));
+    assert.equal(stamp, version, `${manifest}/plugin.json 版本必须与 references/sdd-skills-version.txt 一致`);
+  }
+  assert.match(syncSkill, /references\/sdd-skills-version\.txt/, 'sync 必须从版本戳文件读取当前版本');
+});
+
+test('init 与 retrofit 共用安装参考，访谈提供的许可均有模板', () => {
+  const sharedRef = 'skills/init-sdd-project/references/governance-install.md';
+  assert.ok(existsSync(path.join(repoRoot, sharedRef)), '共用参考必须存在');
+  assert.match(initSkill, /references\/governance-install\.md/);
+  assert.match(retrofitSkill, /references\/governance-install\.md/);
+  assert.ok(
+    existsSync(path.join(repoRoot, 'skills', 'init-sdd-project', 'templates', 'AGENTS.md')),
+    '必须提供 AGENTS.md 代理入口模板',
+  );
+  for (const license of ['MIT', 'Apache-2.0', 'PROPRIETARY']) {
+    assert.ok(
+      existsSync(path.join(repoRoot, 'skills', 'init-sdd-project', 'templates', 'licenses', `${license}.txt`)),
+      `缺少许可模板 ${license}.txt`,
+    );
+  }
+});

@@ -23,10 +23,10 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。当 sd
 
 ### 1. 读来源戳、定版本差
 - 读项目 `.claude/rules/.sdd-version` 拿到 init 时的 sdd-skills 版本 / commit。**无戳**（老项目）→ 当作未知，做 best-effort 全量对账，并提醒用户本次同步后即写入戳记、以后改走增量。
-- 读插件当前版本（`${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` 的 `version`）。版本相同且无改动 → 告知"已最新"，结束。
+- 读插件当前版本（`skills/init-sdd-project/references/sdd-skills-version.txt`，随技能目录分发、任何安装方式都可读；插件根是 git 检出时再取 `HEAD` commit）。版本相同且无改动 → 告知"已最新"，结束。
 
 ### 2. 逐文件对账
-- 权威模板固定为 `skills/init-sdd-project/templates/`（Claude Code 下 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/`；Codex / opencode 下从技能根定位同一路径），不得从其他副本反向同步。模板 `claude-rules/README.md` 对应项目 `.claude/rules/README.md`，其他文件按 init 的既有映射逐一对账。
+- 权威模板固定为 `skills/init-sdd-project/templates/`（Claude Code 下 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/`；Codex / opencode 下从技能根定位同一路径），不得从其他副本反向同步。模板 `claude-rules/README.md` 对应项目 `.claude/rules/README.md`，其他文件按共用参考 `skills/init-sdd-project/references/governance-install.md` §2 的安装映射逐一对账（含 `AGENTS.md` 入口段：项目缺失时作为上游新增文件处理，已存在时只补入口段）。
 - 对每个映射先区分四种状态：已有文件的章节增量、上游新增文件、上游删除文件、冲突；不得把“文件不同”直接等同于“整文件替换”。
 - **三方合并优先**：插件是 git 检出且含戳记 commit 时，用 `git -C <插件根> show <戳记commit>:<模板路径>` 取 base，精确分清“上游改的”与“项目改的”。
 - 取不到 base（非 git / 拷贝安装 / 无戳）→ 继续做**两方降级对账**：project（项目文件）与 upstream（当前模板）逐章节比较，按锚点判断通用治理正文增量与项目填充；不能确认归属时按冲突处理，不因缺少 base 而整文件覆盖。

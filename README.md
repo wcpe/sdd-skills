@@ -12,7 +12,7 @@
 
 ## 脚手架技能（一次性套上 SDD）
 
-- **[init-sdd-project](skills/init-sdd-project/SKILL.md)**：从零初始化一个 SDD 项目脚手架——项目级规格（PRD/架构/ADR/API）+ 功能级规格（specs）+ 防漂移规则 + 工程化（版本/分支/运维/许可/静态检查），并接入 `sdd-*` 迭代技能。
+- **[init-sdd-project](skills/init-sdd-project/SKILL.md)**：从零初始化一个 SDD 项目脚手架——项目级规格（PRD/架构/ADR/API）+ 功能级规格（specs）+ 防漂移规则 + 工程化（版本/分支/运维/许可/静态检查），生成 `AGENTS.md` 代理入口，并接入 `sdd-*` 迭代技能；目录已有业务代码时转交 retrofit。
 - **[retrofit-to-sdd](skills/retrofit-to-sdd/SKILL.md)**：把**现有代码库**逆向改造成 SDD 驱动——不改业务代码，从代码反向提取架构、补齐 PRD/ARCHITECTURE/ADR 与治理。
 
 ## 迭代技能（日常用，`sdd-` 前缀）
@@ -112,7 +112,7 @@ cp -r sdd-skills/skills/* ~/.config/opencode/skills/   # 全局：所有项目�
 # 或仅当前项目：拷进 <项目>/.opencode/skills/（或 .claude/skills/）
 ```
 
-> Windows 用 `Copy-Item sdd-skills\skills\* <目标> -Recurse`。`skills/init-sdd-project/templates/` 是唯一权威模板源，安装时必须让 `init-sdd-project` 与 `retrofit-to-sdd` 保持同级：Claude Code 通过 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/` 定位，Codex 与 opencode 通过 `../init-sdd-project/templates/` 复用同一目录。
+> Windows 用 `Copy-Item sdd-skills\skills\* <目标> -Recurse`。`skills/init-sdd-project/templates/` 是唯一权威模板源（共用参考在同级的 `references/`），安装时必须让 `init-sdd-project` 与 `retrofit-to-sdd` 保持同级：Claude Code 通过 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/` 定位，Codex 与 opencode 通过 `../init-sdd-project/templates/` 复用同一目录。
 
 ## 仓库结构
 
@@ -127,9 +127,10 @@ sdd-skills/                         ← 仓库根 = 插件本体（Claude 经 wc
 ├── skills/                         所有技能（SKILL.md，三种工具通用；opencode 靠目录发现）
 │   ├── init-sdd-project/
 │   │   ├── SKILL.md
-│   │   └── templates/              唯一权威模板源：claude-rules · docs 骨架 · github · gitignore · licenses · VERSION
+│   │   ├── references/             init / retrofit 共用参考（安装映射 · 既有文件合并 · 收尾验收清单）+ sdd-skills 版本戳
+│   │   └── templates/              唯一权威模板源：claude-rules · AGENTS.md · docs 骨架 · github · gitignore · licenses（MIT / Apache-2.0 / 保留所有权利）· VERSION
 │   ├── retrofit-to-sdd/
-│   │   └── SKILL.md                复用 ../init-sdd-project/templates/，不维护模板副本
+│   │   └── SKILL.md                复用 ../init-sdd-project/templates/ 与 references/，不维护副本
 │   ├── sdd-brainstorming/SKILL.md         ┐
 │   ├── sdd-develop-feature/SKILL.md       │
 │   ├── sdd-fix-bug/SKILL.md               │
