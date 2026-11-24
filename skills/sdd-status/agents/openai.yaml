@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD Status"
+  short_description: "Report FR status and spec drift for an SDD project (read-only)."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd-status to report FR progress and drift signals for this project."
