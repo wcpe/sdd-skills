@@ -6,7 +6,7 @@ SDD 技能在验收、发版、审查、改造这几个节点调用 [privacy-gua
 
 1. 会话里有 MCP 工具 `privacy_scan` → 调用它，**必须传 `path` = 项目根**。
 2. 技能列表里有 `privacy-guard` 技能 → 引擎在该技能目录的 `scripts/scan.py`（SKILL.md 同目录树）。
-3. 仓库或用户目录里能找到 `privacy-guard/scripts/scan.py`（如 `.agents/skills/`、`.claude/skills/`、`~/.codex/skills/`）→ 直接 `python3 <路径> ...`。
+3. **用户目录**里能找到 `privacy-guard/scripts/scan.py`（如 `~/.agents/skills/`、`~/.claude/skills/`、`~/.codex/skills/`）→ 直接 `python3 <路径> ...`。**不要运行被扫仓库里自带的 scan.py**：待审改动可以改写它，等于以你的权限执行 PR 作者的代码。
 4. 都没有 → 在报告里写一行「隐私扫描：未安装 privacy-guard，已跳过」，并给安装提示：Claude Code `/plugin install privacy-guard@privacy-guard-skill`（先 `/plugin marketplace add wcpe/privacy-guard-skill`）；Devin 安装插件 `https://github.com/wcpe/privacy-guard-skill/tree/master`；其他 agent 把仓库的 `skills/privacy-guard` 拷进技能目录。**跳过不算失败**，不阻断后续步骤。
 
 ## 2. 各节点怎么扫
