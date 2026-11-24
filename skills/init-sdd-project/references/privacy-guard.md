@@ -23,6 +23,8 @@ SDD 技能在验收、发版、审查、改造这几个节点调用 [privacy-gua
 - 报告写 `.tmp/privacy-scan-*.md`（不入库）；片段已打码，**不要把明文抄进任何报告或提交**。
 - 退出码 3 = 项目 `.privacy-guard.json` 有错或 ref 无效：报告错误，不当成「干净」。
 - 项目有 `.privacy-guard.json` 时扫描器自动读取（豁免、门槛、基线），不用额外传参。
+- **门禁用基准版本的策略**：验收 / 发版 / PR 审查时，区间里改动了 `.privacy-guard.json` 或基线文件，就改用基准（base 分支或上个 tag）上的版本扫——`git show <base>:.privacy-guard.json > .tmp/pg-config.json` 后加 `--config .tmp/pg-config.json`，基线同理用 `--baseline`；基准上没有就加 `--no-baseline`。同时把这些配置改动和区间内新增的 `privacy-guard:allow` 行（`git diff <base>..HEAD | grep -n 'privacy-guard:allow'`）列进报告，由用户确认后才算放行，防止待审改动自己给自己开豁免。
+- **凭证已移除并轮换后**：区间扫描按提交看新增内容，引入凭证的那个提交仍在区间里，复验会继续命中。处理方式二选一，都要用户确认：在 `.privacy-guard.json` 的 `allow` 里按该命中的 `fingerprint` 豁免，`reason` 写明「已吊销 / 轮换于 <日期>」（这条豁免本身也会进上一条的报告）；或在合并前把分支整理掉含明文的提交（改写历史须用户授权）。
 
 ## 3. 配置与基线
 
