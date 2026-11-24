@@ -16,12 +16,12 @@
 
 ## 文档导航
 - 需求：[`docs/PRD.md`](docs/PRD.md)
-- 架构：[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- 架构：[`ARCHITECTURE.md`](ARCHITECTURE.md)
 - 接口：[`docs/API.md`](docs/API.md)
 - 运维：[`docs/OPERATIONS.md`](docs/OPERATIONS.md)
 - 安全：[`SECURITY.md`](SECURITY.md)
 - 决策：[`docs/adr/`](docs/adr/)
-- 演进与维护：[`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md)
+- 演进与维护：[`CONTRIBUTING.md`](CONTRIBUTING.md)
 - 变更史：[`CHANGELOG.md`](CHANGELOG.md)
 
 ## 快速开始

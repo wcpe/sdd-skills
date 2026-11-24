@@ -5,6 +5,8 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。重构
 
 # 重构
 
+旧布局兼容：`ARCHITECTURE.md` / `CONTRIBUTING.md` 在仓库根找不到时，读写 `docs/` 下的同名文件，不擅自迁移；收尾提示用户可用 `sdd-sync-governance` 迁到仓库根。
+
 ## 核心原则
 
 重构 = **改内部结构、不改外部行为**。用测试当安全网保证行为不变，针对真实坏味道，小步前进。
@@ -27,7 +29,7 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。重构
 - 重构前后**同一组测试同样通过**，无行为差异。这是重构成功的唯一标准。
 
 ### 5. 文档与提交
-- 仅当模块 / 依赖 / 机制结构变化时更新 `docs/ARCHITECTURE.md`；纯内部重构通常不动 PRD / API。
+- 仅当模块 / 依赖 / 机制结构变化时更新 `ARCHITECTURE.md`；纯内部重构通常不动 PRD / API。
 - 若重构实质改变了某条架构决策 → 写新 ADR 取代（`decision-alignment`）。
 - 一般无用户可见变更，可不记 CHANGELOG（若有外部影响则记）；中文提交 `refactor(scope): …`，不自动 push。
 

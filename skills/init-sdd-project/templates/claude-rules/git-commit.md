@@ -118,8 +118,8 @@ release commit 只包含版本号、CHANGELOG 定稿以及发布所必需的元�
 应当入库的耐久文档：
 
 - 产品与需求：`README.md`、`CHANGELOG.md`、`docs/PRD.md`。
-- 架构与契约：`docs/ARCHITECTURE.md`、`docs/adr/*.md`、`docs/API.md`。
-- 协作治理：`docs/CONTRIBUTING.md`、`.claude/rules/*.md`。
+- 架构与契约：`ARCHITECTURE.md`、`docs/adr/*.md`、`docs/API.md`。
+- 协作治理：`CONTRIBUTING.md`、`.claude/rules/*.md`。
 
 严禁入库的易朽过程稿：
 
@@ -127,7 +127,7 @@ release commit 只包含版本号、CHANGELOG 定稿以及发布所必需的元�
 - 过程性报告，例如 `IMPLEMENTATION.md`、`执行报告.md`、`分析.md`、`audit-*.md`。
 - AI 助手过程性笔记、交流稿、思路记录。
 
-文档与代码的同步要求见 `docs/CONTRIBUTING.md` 与 `.claude/rules/doc-sync.md`。
+文档与代码的同步要求见 `CONTRIBUTING.md` 与 `.claude/rules/doc-sync.md`。
 
 ## 6. 提交操作底线
 

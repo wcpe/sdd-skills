@@ -25,14 +25,14 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 
 ### 2. 反向提取项目级规格（忠于现状，这是逆向最大价值）
 - **每条事实带证据**：已交付 FR、ADR 追认、不变量都要能指回代码——在 `.tmp/` 现状速览里记下对应的文件路径 / 模块 / 入口；找不到证据的不写成已交付，列入缺口清单问用户。
-- **`docs/ARCHITECTURE.md`**：把代码里**隐含的架构显式化**——现有模块/数据模型/机制/依赖流向**照实写**。
+- **`ARCHITECTURE.md`（仓库根）**：把代码里**隐含的架构显式化**——现有模块/数据模型/机制/依赖流向**照实写**。
 - **`docs/PRD.md`**：从现有功能反推需求，FR 以**用户可感知的能力**为粒度（一个 FR 对应一组接口 / 命令 / 页面，而不是一个函数或类）；FR 表里**已实现的标 `已交付`**、规划中的标 `计划`；别把已做的写成 TODO。
 - **`docs/API.md`**：照现有对外接口写契约。
 - **`docs/adr/`**：把代码里**已经成立的重大决策**补记为 ADR（选了什么框架/为何这样分层/关键取舍），状态写 `已接受`、背景注明"现状追认"。**只追认重大的**，别给每个细节写 ADR（会滥用）。
 - **`.claude/rules/architecture-invariants.md`**：把现有代码**事实上的边界与禁忌**固化为不变量（据现状，不是空想）。
 
 ### 3. 安装通用治理（从权威模板拷贝，按本项目替换占位符）
-- 按共用参考 §2 安装映射落地：权威模板的 `claude-rules/*`、`AGENTS.md`、`docs/` 下的 CONTRIBUTING / adr / specs、`github/*`、`editorconfig.txt`、按栈选 `.gitignore`。迭代技能**不拷入项目**——`sdd-*` 技能随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装。
+- 按共用参考 §2 安装映射落地：权威模板的 `claude-rules/*`、`AGENTS.md`、仓库根的 `CONTRIBUTING.md`、`docs/` 下的 adr / specs、`github/*`、`editorconfig.txt`、按栈选 `.gitignore`。迭代技能**不拷入项目**——`sdd-*` 技能随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装。
 - 补 `CHANGELOG.md` / `VERSION` / `SECURITY.md` / `docs/OPERATIONS.md` 骨架（据现状填）。
 - **老仓库几乎每个目标路径都可能已存在**：一律按共用参考 §3 合并不覆盖（`.gitignore`、README、CONTRIBUTING、`.github` 模板、`.editorconfig`、`.claude/rules`、`AGENTS.md` / `CLAUDE.md`、`LICENSE`）。
 - 按共用参考 §1 写 `.claude/rules/.sdd-version` 来源戳。

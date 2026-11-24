@@ -14,7 +14,7 @@
 |---|---|---|---|
 | `docs/PRD.md` | 需求（WHAT/WHY）：目标、角色、功能需求、验收 | 需求增删改时 | ✓ 活文档 |
 | `docs/specs/<feature>.md` | 功能开发期的工作规格（需求/设计/任务/验收），命中 spec-checklist 才写 | 开发该功能时 | ✓ 留作记录 |
-| `docs/ARCHITECTURE.md` | 系统设计（HOW）：模块、数据模型、机制、部署 | 结构/机制/依赖变化时 | ✓ |
+| `ARCHITECTURE.md` | 系统设计（HOW）：模块、数据模型、机制、部署 | 结构/机制/依赖变化时 | ✓ |
 | `docs/adr/*` | 重大决策的"为什么" | 做出/推翻架构决策时（见 §3） | ✓ |
 | `docs/API.md` | 对外接口契约 | 接口变更时 | ✓ |
 | `CHANGELOG.md` | 变更史 | 每个用户可见变更 | ✓ |
@@ -90,7 +90,7 @@
 
 ### 8.1 提交历史治理（摘要）
 
-提交历史治理以 [`../.claude/rules/git-commit.md`](../.claude/rules/git-commit.md) 为唯一依据；本文只保留频繁提交、逻辑提交与主线整理的协作摘要，不复制具体操作细则。
+提交历史治理以 [`.claude/rules/git-commit.md`](.claude/rules/git-commit.md) 为唯一依据；本文只保留频繁提交、逻辑提交与主线整理的协作摘要，不复制具体操作细则。
 
 - 开发分支应频繁提交安全检查点，不得长期堆积未提交变更；`fixup!`、`squash!` 只可作为合并前会被整理掉的临时标记。
 - 合并前审查全部提交，清理 WIP、临时标记、拼写问题和跟随修复；过大或多意图提交按逻辑拆分。
@@ -109,7 +109,7 @@
 | 文档 | 演进方式 |
 |---|---|
 | `docs/PRD.md` | **增量 + 状态流转**：加需求即加一行 FR（`计划`→`开发中`→`已交付@vX.Y.Z`），已交付的保留并标版本、不删——它是活的路线图 |
-| `docs/ARCHITECTURE.md` | **原地更新**：始终反映当前系统真貌；结构 / 机制变了就改它 |
+| `ARCHITECTURE.md` | **原地更新**：始终反映当前系统真貌；结构 / 机制变了就改它 |
 | `docs/adr/*` | **只追加 + 取代**：决策变了写新 ADR 取代旧的，旧的不删（§3） |
 | `docs/API.md` | **原地更新**：始终是当前契约 |
 | `CHANGELOG.md` | **累积 + 发版分段**：变更先进未发布段，发版时切成 `## X.Y.Z` 段 |
@@ -120,7 +120,7 @@
 |---|---|---|
 | 🔥 高频（几乎每次迭代） | `CHANGELOG.md` | 每个用户可见变更 |
 | 🔥 高频 | `docs/PRD.md` | 每个新需求 / 交付（加行 / 改状态） |
-| 🌡 中频（有相应变化才动） | `docs/ARCHITECTURE.md`、`docs/API.md` | 结构 / 机制 / 接口变更时 |
+| 🌡 中频（有相应变化才动） | `ARCHITECTURE.md`、`docs/API.md` | 结构 / 机制 / 接口变更时 |
 | 🌡 中频 | `docs/OPERATIONS.md` | 部署 / 运维方式变化时 |
 | 🌡 中频 | `docs/specs/<feature>.md` | 功能开发期；交付后基本不动 |
 | ❄ 低频 | `docs/adr/*`、`README.md`、`SECURITY.md` | 架构决策时追加 / 总览或安全模型变化时 |
@@ -168,7 +168,7 @@
 
 | 来了什么 | 要动 | 不用动 |
 |---|---|---|
-| **feat 新功能** | PRD §4 加一行 FR（贴**已有**期 + 状态 `计划`）· 命中 spec-checklist 任一条则写 `docs/specs/<f>.md`（见 [`specs/README.md`](specs/README.md)）· 结构变更动 `ARCHITECTURE` · 接口变更动 `API` · `CHANGELOG` +1 行 · 加测试 | 期数 · `VERSION`（发版才动） |
+| **feat 新功能** | PRD §4 加一行 FR（贴**已有**期 + 状态 `计划`）· 命中 spec-checklist 任一条则写 `docs/specs/<f>.md`（见 [`docs/specs/README.md`](docs/specs/README.md)）· 结构变更动 `ARCHITECTURE` · 接口变更动 `API` · `CHANGELOG` +1 行 · 加测试 | 期数 · `VERSION`（发版才动） |
 | **fix 修 bug** | `CHANGELOG` +1 行 · 复现 + 回归测试 | PRD · 期数 · `VERSION` · ADR · API |
 | **refactor 重构** | 结构变才动 `ARCHITECTURE` · 测试前后同样全绿 | PRD · 期数 · API · 行为 |
 | **rollback 回滚** | FR 状态回退 · 取代相关 ADR · `CHANGELOG` +1（移除） | 期数 |

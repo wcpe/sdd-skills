@@ -5,6 +5,8 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。对代码库
 
 # 代码审查（review）
 
+旧布局兼容：`ARCHITECTURE.md` / `CONTRIBUTING.md` 在仓库根找不到时，读写 `docs/` 下的同名文件，不擅自迁移；收尾提示用户可用 `sdd-sync-governance` 迁到仓库根。
+
 ## 核心原则
 
 代码 review = **系统性地"找问题 + 定级 + 路由"**,不顺手修。两条命脉:
@@ -26,7 +28,7 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。对代码库
 - **`module`** —— 指定路径 / 包。
 
 ### 2. 先读项目的权威标准
-- 读 `.claude/rules/*`(尤其 `architecture-invariants`:本项目的分层 / 禁用件 / 红线)、`docs/ARCHITECTURE.md`、`docs/adr/*`。
+- 读 `.claude/rules/*`(尤其 `architecture-invariants`:本项目的分层 / 禁用件 / 红线)、`ARCHITECTURE.md`、`docs/adr/*`。
 - 这些是"这个项目认什么"的真源——review **以它们为第一基准**,避免拿外部教条硬套到一个有意做了别的取舍的项目上。
 
 ### 3. 按维度逐项审（每条要证据）

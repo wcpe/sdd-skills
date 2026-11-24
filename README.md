@@ -192,11 +192,12 @@ sdd-skills/                         ← 仓库根 = 插件本体（Claude 经 wc
     docs/
       PRD.md            §4 FR 表带"状态"列：计划 / 开发中 / 已交付@版本
                         §7 分期表：P1 / P2 / P3 各自的主题
-      ARCHITECTURE.md   模块 / 数据模型 / 机制
       API.md            接口契约
       adr/0001-*.md     init 期间敲定的重大决策（技术栈选型等，"现状追认"）
       specs/_template.md  命中 spec-checklist 的功能开发前复制一份写规格
-      OPERATIONS.md · SECURITY.md · CONTRIBUTING.md
+      OPERATIONS.md · SECURITY.md
+    ARCHITECTURE.md     模块 / 数据模型 / 机制（仓库根，与 README 同级）
+    CONTRIBUTING.md     文档地图 / ADR 生命周期 / 变更工作流（仓库根）
     .claude/rules/      防漂移红线（架构不变量、doc-sync、scope-discipline...）
     CHANGELOG.md · VERSION（0.1.0）· README · LICENSE · .gitignore · .github/
     .tmp/实施计划.md    里程碑/任务清单（不入库，会过期）

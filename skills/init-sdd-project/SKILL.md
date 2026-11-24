@@ -33,14 +33,14 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 
 ### 2. 生成项目特定文档（据 `templates/docs/_skeletons/` + 访谈填实）
 - `docs/PRD.md`：目标/非目标/角色/用户故事/FR 表（四列 `| FR-NN | 需求 | 优先级 | 状态 |`，状态取 计划/开发中/已交付@版本）/NFR/验收/术语。
-- `docs/ARCHITECTURE.md`：定位/模块/数据模型/接口/机制/部署/关键裁决/边界。
+- `ARCHITECTURE.md`：定位/模块/数据模型/接口/机制/部署/关键裁决/边界（放仓库根，与 README 同级）。
 - `docs/API.md`：按项目接口形态填契约。
 - `docs/adr/0001…`：把访谈里定下的**重大决策**各写一条 ADR（技术栈选型、核心架构取舍…），用 `templates/docs/_skeletons/ADR.md`；从 0001 顺序编号。
 - `.claude/rules/architecture-invariants.md`：据本项目锁定的边界/禁用件/红线**填实** `templates/claude-rules/architecture-invariants.md` 的占位（这条是项目专属，不能照搬别人的）。
 - `README.md` / `CHANGELOG.md` / `docs/OPERATIONS.md` / `SECURITY.md` / `VERSION` / `LICENSE`：据访谈填实（许可按用户选择，从 `templates/licenses/` 取）。
 
 ### 3. 原样安装通用治理（从 `templates/` 拷贝，仅替换占位符）
-- 按共用参考 §2 安装映射逐项落地：`.claude/rules/*`、`AGENTS.md`、`docs/` 下的 CONTRIBUTING / adr / specs、`.github/`、`.editorconfig`、按栈选的 `.gitignore`。
+- 按共用参考 §2 安装映射逐项落地：`.claude/rules/*`、`AGENTS.md`、仓库根的 `CONTRIBUTING.md`、`docs/` 下的 adr / specs、`.github/`、`.editorconfig`、按栈选的 `.gitignore`。
 - 迭代技能**不拷进项目**：16 个 `sdd-*` 技能随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装；项目侧不放 `.claude/skills/`。
 - 按共用参考 §1 写 `.claude/rules/.sdd-version` 来源戳。
 仅替换占位符：项目名、技术栈、提交 scope 例子、测试高风险区、P2/P3 能力、静态检查工具等。

@@ -5,6 +5,8 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 
 # 并行开发多个 FR
 
+旧布局兼容：`ARCHITECTURE.md` / `CONTRIBUTING.md` 在仓库根找不到时，读写 `docs/` 下的同名文件，不擅自迁移；收尾提示用户可用 `sdd-sync-governance` 迁到仓库根。
+
 ## 核心原则
 
 把"开一批 FR"从串行变并行,要解决四件事:
@@ -109,7 +111,7 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 工作目录已切到该 worktree;主分支基线是 <main>;依赖 FR 已全部 `已交付`。
 
 请按 sdd-develop-feature 全流程走:
-1. 读 docs/PRD.md(关注 FR-X 那行)、docs/ARCHITECTURE.md、相关 docs/adr/
+1. 读 docs/PRD.md(关注 FR-X 那行)、ARCHITECTURE.md、相关 docs/adr/
 2. spec: <主控判定结果>
    - 需 spec → 主控已写好并审核通过的 spec 在 `docs/specs/<feature>.md`，**先读再执行**，严格按 spec 的任务拆分和验收标准推进
    - 免 spec → 跳过

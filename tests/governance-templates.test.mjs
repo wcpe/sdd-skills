@@ -76,7 +76,6 @@ const contributing = readRepo(
   'skills',
   'init-sdd-project',
   'templates',
-  'docs',
   'CONTRIBUTING.md',
 );
 
@@ -201,7 +200,7 @@ test('CONTRIBUTING 摘要提交历史治理并链接权威规则', () => {
     contributing.split(/\r?\n/).includes(contributingHeading),
     'CONTRIBUTING 必须使用逐字一致的提交历史治理标题',
   );
-  assert.match(contributing, /\.\.\/\.claude\/rules\/git-commit\.md/);
+  assert.match(contributing, /\]\(\.claude\/rules\/git-commit\.md\)/);
   assertParagraphWithTerms(
     contributing,
     [/提交历史/, /(?:频繁提交|逻辑提交|主线整理)/],
@@ -355,5 +354,46 @@ test('斜杠命令 /sdd 与 /sdd-status 有对应技能', () => {
   for (const name of ['sdd', 'sdd-status']) {
     const skill = readRepo('skills', name, 'SKILL.md');
     assert.match(skill, new RegExp(`^---\\nname: ${name}\\n`), `${name} 技能 frontmatter name 必须一致`);
+  }
+});
+
+test('模板安装到目标布局后相对链接都能解析', () => {
+  const templateRoot = path.join(repoRoot, 'skills', 'init-sdd-project', 'templates');
+  const installed = new Map([
+    ['README.md', 'docs/_skeletons/README.md'],
+    ['AGENTS.md', 'AGENTS.md'],
+    ['CONTRIBUTING.md', 'CONTRIBUTING.md'],
+    ['docs/adr/README.md', 'docs/adr/README.md'],
+    ['docs/specs/README.md', 'docs/specs/README.md'],
+    ['.claude/rules/README.md', 'claude-rules/README.md'],
+  ]);
+  const targets = new Set([
+    ...installed.keys(),
+    'ARCHITECTURE.md', 'CHANGELOG.md', 'SECURITY.md', 'LICENSE', 'VERSION',
+    'docs/PRD.md', 'docs/API.md', 'docs/OPERATIONS.md', 'docs/adr', 'docs/specs',
+    'docs/adr/_template.md', 'docs/specs/_template.md', '.claude/rules',
+    ...readdirSync(path.join(templateRoot, 'claude-rules')).map((name) => `.claude/rules/${name}`),
+  ]);
+  for (const [target, source] of installed) {
+    const content = readFileSync(path.join(templateRoot, source), 'utf8');
+    for (const [, href] of content.matchAll(/\]\(([^)#\s]+)(?:#[^)]*)?\)/g)) {
+      if (/^[a-z]+:/i.test(href) || href.includes('<')) continue;
+      const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(target), href)).replace(/\/$/, '');
+      assert.ok(targets.has(resolved), `${target} 的链接 ${href} 安装后指向不存在的 ${resolved}`);
+    }
+  }
+});
+
+test('读取根目录 ARCHITECTURE / CONTRIBUTING 的迭代技能兼容旧布局', () => {
+  const skillsRoot = path.join(repoRoot, 'skills');
+  for (const name of readdirSync(skillsRoot).filter((n) => n.startsWith('sdd-') && n !== 'sdd-sync-governance')) {
+    const file = path.join(skillsRoot, name, 'SKILL.md');
+    const content = readFileSync(file, 'utf8');
+    if (!/(?<!docs\/)(ARCHITECTURE|CONTRIBUTING)\.md/.test(content)) continue;
+    assert.match(
+      content,
+      /旧布局兼容：`ARCHITECTURE\.md` \/ `CONTRIBUTING\.md` 在仓库根找不到时，读写 `docs\/` 下的同名文件，不擅自迁移/,
+      `${name} 读取根目录文档但缺少回退到 docs/ 的旧布局兼容说明`,
+    );
   }
 });
