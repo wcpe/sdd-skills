@@ -5,6 +5,8 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。修复
 
 # 修复缺陷
 
+旧布局兼容：`ARCHITECTURE.md` / `CONTRIBUTING.md` 在仓库根找不到时，读写 `docs/` 下的同名文件，不擅自迁移；收尾提示用户可用 `sdd-sync-governance` 迁到仓库根。
+
 ## 核心原则
 
 先复现、再定位根因、最后最小修复——不靠猜、不只治标、不夹带无关改动。让"修好了"有客观证据。

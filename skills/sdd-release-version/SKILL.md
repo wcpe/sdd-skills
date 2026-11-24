@@ -5,6 +5,8 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。发布
 
 # 发布版本
 
+旧布局兼容：`ARCHITECTURE.md` / `CONTRIBUTING.md` 在仓库根找不到时，读写 `docs/` 下的同名文件，不擅自迁移；收尾提示用户可用 `sdd-sync-governance` 迁到仓库根。
+
 ## 核心原则
 
 发版 tag 必须指向“版本号、CHANGELOG、文档、可交付物构建结果全部一致”的本地提交。触发本技能即表示允许在全部既有逻辑提交之后追加**独立**的本地 release commit 和本地附注 tag，但**永远不含远程 push 授权**。详细、通用的提交历史治理规范以项目 `.claude/rules/git-commit.md` 为准，本技能只规定发版所需动作，不复制整套规则。

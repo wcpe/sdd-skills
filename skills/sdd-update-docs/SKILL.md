@@ -5,6 +5,8 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。当工
 
 # 更新文档
 
+旧布局兼容：`ARCHITECTURE.md` / `CONTRIBUTING.md` 在仓库根找不到时，读写 `docs/` 下的同名文件，不擅自迁移；收尾提示用户可用 `sdd-sync-governance` 迁到仓库根。
+
 ## 核心原则
 
 文档是活的真源，改它要遵循每篇的**演进方式**、保持**单一真源**、不留漂移。**纯文档任务**用本技能；若文档变更是**伴随代码改的**，走对应的 `sdd-develop-feature` / `sdd-fix-bug` / `sdd-refactor-code` 等技能（它们自带 `doc-sync` 步骤）。

@@ -383,3 +383,13 @@ test('模板安装到目标布局后相对链接都能解析', () => {
     }
   }
 });
+
+test('读取根目录 ARCHITECTURE / CONTRIBUTING 的迭代技能兼容旧布局', () => {
+  const skillsRoot = path.join(repoRoot, 'skills');
+  for (const name of readdirSync(skillsRoot).filter((n) => n.startsWith('sdd-') && n !== 'sdd-sync-governance')) {
+    const file = path.join(skillsRoot, name, 'SKILL.md');
+    const content = readFileSync(file, 'utf8');
+    if (!/(?<!docs\/)(ARCHITECTURE|CONTRIBUTING)\.md/.test(content)) continue;
+    assert.match(content, /旧布局兼容/, `${name} 读取根目录文档但缺少旧布局兼容说明`);
+  }
+});

@@ -5,6 +5,8 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。开发
 
 # 开发新功能
 
+旧布局兼容：`ARCHITECTURE.md` / `CONTRIBUTING.md` 在仓库根找不到时，读写 `docs/` 下的同名文件，不擅自迁移；收尾提示用户可用 `sdd-sync-governance` 迁到仓库根。
+
 ## 核心原则
 
 新功能要落在既定方向上，而不是另起炉灶：先对齐需求与架构、确认它在当前阶段范围内、用可验证的目标驱动实现，最后让文档与代码保持一致。完整流程见 `CONTRIBUTING.md`，红线见 `.claude/rules/`。

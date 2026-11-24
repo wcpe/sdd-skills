@@ -5,6 +5,8 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。重构
 
 # 重构
 
+旧布局兼容：`ARCHITECTURE.md` / `CONTRIBUTING.md` 在仓库根找不到时，读写 `docs/` 下的同名文件，不擅自迁移；收尾提示用户可用 `sdd-sync-governance` 迁到仓库根。
+
 ## 核心原则
 
 重构 = **改内部结构、不改外部行为**。用测试当安全网保证行为不变，针对真实坏味道，小步前进。

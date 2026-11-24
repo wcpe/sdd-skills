@@ -21,4 +21,4 @@ description: SDD（规格驱动开发）工作流入口与路由。用户只说"
 - 起新 SDD 项目 → `init-sdd-project`；老项目补 SDD → `retrofit-to-sdd`
 - 看进度 / 查漂移 → `sdd-status`
 
-除 `init-sdd-project` / `retrofit-to-sdd` 外，路由前先确认目标目录有 `docs/PRD.md` 与 `.claude/rules/`；没有就先问用户是新项目（init）还是老项目（retrofit）。`ARCHITECTURE.md` / `CONTRIBUTING.md` 还在 `docs/` 下的旧布局项目，先走 `sdd-sync-governance` 迁到仓库根，否则迭代技能读不到。不确定就问，别臆测。
+除 `init-sdd-project` / `retrofit-to-sdd` 外，路由前先确认目标目录有 `docs/PRD.md` 与 `.claude/rules/`；没有就先问用户是新项目（init）还是老项目（retrofit）。`ARCHITECTURE.md` / `CONTRIBUTING.md` 还在 `docs/` 下的旧布局项目照常路由（各技能按实际位置读写）；用户想迁到仓库根时走 `sdd-sync-governance`。不确定就问，别臆测。

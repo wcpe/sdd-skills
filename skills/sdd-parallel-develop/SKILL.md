@@ -5,6 +5,8 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。批量并行
 
 # 并行开发多个 FR
 
+旧布局兼容：`ARCHITECTURE.md` / `CONTRIBUTING.md` 在仓库根找不到时，读写 `docs/` 下的同名文件，不擅自迁移；收尾提示用户可用 `sdd-sync-governance` 迁到仓库根。
+
 ## 核心原则
 
 把"开一批 FR"从串行变并行,要解决四件事:

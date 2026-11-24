@@ -5,6 +5,8 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。把一个完
 
 # 需求探讨与拆解（brainstorming）
 
+旧布局兼容：`ARCHITECTURE.md` / `CONTRIBUTING.md` 在仓库根找不到时，读写 `docs/` 下的同名文件，不擅自迁移；收尾提示用户可用 `sdd-sync-governance` 迁到仓库根。
+
 ## 核心原则
 
 一个"完整需求"往往**模糊、跨多部分**。不盘问清楚就开干,会基于没验证的假设返工。本技能**先把需求盘清,再拆成确切的 FR、定验收、确定执行方式**——它是日常迭代的**前置门**,喂给 `sdd-develop-feature` / `sdd-parallel-develop` / `sdd-fix-bug`,但**自己不写实现代码**(同 `sdd-realign-prd` / `sdd-accept-phase` 的"只规划 / 判定不动手"分工)。

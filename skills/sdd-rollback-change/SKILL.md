@@ -5,6 +5,8 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。回滚
 
 # 回滚改动
 
+旧布局兼容：`ARCHITECTURE.md` / `CONTRIBUTING.md` 在仓库根找不到时，读写 `docs/` 下的同名文件，不擅自迁移；收尾提示用户可用 `sdd-sync-governance` 迁到仓库根。
+
 ## 核心原则
 
 回滚是一次**有意的反向变更**，必须可追溯：弄清回滚什么、评估影响、用安全方式撤销、把决策与文档一并回正——不是悄悄删掉了事。
