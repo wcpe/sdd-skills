@@ -12,7 +12,7 @@ process.stdin.on('end', function () {
   try { input = JSON.parse(raw || '{}') } catch (e) { process.exit(0) }
   if (!fs.existsSync('docs/PRD.md') || !fs.existsSync('.claude/rules')) process.exit(0)
   const ti = input.tool_input || {}
-  const fp = String(ti.file_path || '')
+  const fp = String(ti.file_path || ti.path || '')
   if (!/docs[\\/]adr[\\/]\d{4}-.*\.md$/i.test(fp)) process.exit(0)
 
   let content = ''

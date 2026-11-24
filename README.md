@@ -8,11 +8,14 @@
 
 - **Claude Code**：`commands/` 提供 `/sdd` 路由、`/sdd-status` 以及所有 workflow 快捷入口；`hooks/` 提供提交门、ADR 不可变提醒、文档同步提醒；`.mcp.json` 暴露 `sdd_check_drift`。
 - **OpenAI Codex**：`.codex-plugin/plugin.json`、`agents/openai.yaml`、`assets/` 和 `skills/*/agents/openai.yaml` 提供插件页、图标、能力说明、workflow skill cards 与默认 prompt；`.mcp.json` 暴露 `sdd_check_drift`。
+- **Devin**：`.devin-plugin/plugin.json` 为清单，加载全部技能（含 `sdd` 入口与 `sdd-status`，替代 Devin 不加载的斜杠命令）、根目录 `hooks.json`（护栏 hook，匹配 Devin 的 `exec` / `edit` / `write` 工具名）与 `.mcp.json` 的 `sdd_check_drift`。
 - **opencode**：使用通用 `skills/`，不加载 Claude/Codex 插件专属增强。
+
+护栏 hook 一律经 `hooks/run-hook.sh` 启动：hook 进程拿不到交互 shell 的 PATH 时（如 Devin 云端），它按常见安装位置查找 `node`，找不到 `node` 或插件根时静默放行，不会以 exit 127 报错。
 
 ## 脚手架技能（一次性套上 SDD）
 
-- **[init-sdd-project](skills/init-sdd-project/SKILL.md)**：从零初始化一个 SDD 项目脚手架——项目级规格（PRD/架构/ADR/API）+ 功能级规格（specs）+ 防漂移规则 + 工程化（版本/分支/运维/许可/静态检查），并接入 `sdd-*` 迭代技能。
+- **[init-sdd-project](skills/init-sdd-project/SKILL.md)**：从零初始化一个 SDD 项目脚手架——项目级规格（PRD/架构/ADR/API）+ 功能级规格（specs）+ 防漂移规则 + 工程化（版本/分支/运维/许可/静态检查），生成 `AGENTS.md` 代理入口，并接入 `sdd-*` 迭代技能；目录已有业务代码时转交 retrofit。
 - **[retrofit-to-sdd](skills/retrofit-to-sdd/SKILL.md)**：把**现有代码库**逆向改造成 SDD 驱动——不改业务代码，从代码反向提取架构、补齐 PRD/ARCHITECTURE/ADR 与治理。
 
 ## 迭代技能（日常用，`sdd-` 前缀）
@@ -35,7 +38,7 @@
 | `sdd-accept-phase` | 验收：整期 / 当前版本待发 / 当前一批改动（scope 三选一，发布·合并就绪审计） |
 | `sdd-realign-prd` | PRD 结构 / 状态不合规时的诊断 + 工单（不亲自改） |
 | `sdd-review-code` | 代码质量 / bug / 安全审查 → 分级 findings + 路由（不亲自改） |
-| `sdd-parallel-develop` | 并行开发多个 FR（依赖分析 + worktree + 并行 agent + 自动 rebase） |
+| `sdd-parallel-develop` | 并行开发多个 FR（依赖分析 + worktree + 并行 agent + 每个 FR 一个 PR、squash 合并） |
 | `sdd-sync-governance` | 把**上游更新的治理模板**（`.claude/rules`/CONTRIBUTING/specs 模板…）对账并回现有项目 |
 
 > 这些技能只引用项目内的相对路径（`docs/PRD.md`、`.claude/rules/*` 等），装在哪都按"当前项目"解析——所以可全局共享，且更新时无需逐项目同步。（`sdd-sync-governance` 例外：它还要读插件自带的权威模板与项目对账，正是用来弥补"模板拷进项目后不随插件更新"这一缺口。）
@@ -102,6 +105,10 @@ cp -r sdd-skills/skills/* ~/.codex/skills/          # 全局：所有项目可�
 
 插件模式优先，因为它能同时带上 `.mcp.json`、`agents/openai.yaml` 与展示资产。
 
+### Devin
+
+在 Devin 的插件设置里从 GitHub 安装 `wcpe/sdd-skills`（个人或组织范围均可），或在 Devin CLI 里 `devin plugins install wcpe/sdd-skills`。技能以 `/sdd-skills:<技能名>` 暴露；hook 与 MCP 随插件生效，改动对新会话生效。
+
 ### opencode
 
 opencode 原生认 `SKILL.md`（并兼容 `.claude/skills/`），靠**目录发现**、没有 skill 安装命令——把技能拷进它扫描的目录即可：
@@ -112,7 +119,7 @@ cp -r sdd-skills/skills/* ~/.config/opencode/skills/   # 全局：所有项目�
 # 或仅当前项目：拷进 <项目>/.opencode/skills/（或 .claude/skills/）
 ```
 
-> Windows 用 `Copy-Item sdd-skills\skills\* <目标> -Recurse`。`skills/init-sdd-project/templates/` 是唯一权威模板源，安装时必须让 `init-sdd-project` 与 `retrofit-to-sdd` 保持同级：Claude Code 通过 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/` 定位，Codex 与 opencode 通过 `../init-sdd-project/templates/` 复用同一目录。
+> Windows 用 `Copy-Item sdd-skills\skills\* <目标> -Recurse`。`skills/init-sdd-project/templates/` 是唯一权威模板源（共用参考在同级的 `references/`），安装时必须让 `init-sdd-project` 与 `retrofit-to-sdd` 保持同级：Claude Code 通过 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/` 定位，Codex 与 opencode 通过 `../init-sdd-project/templates/` 复用同一目录。
 
 ## 仓库结构
 
@@ -120,6 +127,9 @@ cp -r sdd-skills/skills/* ~/.config/opencode/skills/   # 全局：所有项目�
 sdd-skills/                         ← 仓库根 = 插件本体（Claude 经 wcpe/claude-plugins，Codex 经 wcpe/codex-plugins）
 ├── .claude-plugin/                 Claude Code 插件清单
 │   └── plugin.json
+├── .devin-plugin/                  Devin 插件清单（hooks 见根目录 hooks.json）
+│   └── plugin.json
+├── hooks.json                      Devin 护栏 hook（Claude 用 hooks/hooks.json）
 ├── .codex-plugin/                  Codex 插件清单
 │   └── plugin.json                 skills 指向 ./skills/，MCP 指向 ./.mcp.json
 ├── agents/                         Codex 插件级展示元数据
@@ -127,9 +137,10 @@ sdd-skills/                         ← 仓库根 = 插件本体（Claude 经 wc
 ├── skills/                         所有技能（SKILL.md，三种工具通用；opencode 靠目录发现）
 │   ├── init-sdd-project/
 │   │   ├── SKILL.md
-│   │   └── templates/              唯一权威模板源：claude-rules · docs 骨架 · github · gitignore · licenses · VERSION
+│   │   ├── references/             init / retrofit 共用参考（安装映射 · 既有文件合并 · 收尾验收清单）+ sdd-skills 版本戳
+│   │   └── templates/              唯一权威模板源：claude-rules · AGENTS.md · docs 骨架 · github · gitignore · licenses（MIT / Apache-2.0 / 保留所有权利）· VERSION
 │   ├── retrofit-to-sdd/
-│   │   └── SKILL.md                复用 ../init-sdd-project/templates/，不维护模板副本
+│   │   └── SKILL.md                复用 ../init-sdd-project/templates/ 与 references/，不维护副本
 │   ├── sdd-brainstorming/SKILL.md         ┐
 │   ├── sdd-develop-feature/SKILL.md       │
 │   ├── sdd-fix-bug/SKILL.md               │
@@ -358,8 +369,8 @@ sdd-skills/                         ← 仓库根 = 插件本体（Claude 经 wc
                           → 清零后 sdd-accept-phase 复核基于规范 PRD 的状态
                           ※ 详见下方「PRD 不规范 / 结构错位 怎么纠正」
    批量并行开多个 FR ────► sdd-parallel-develop（依赖分析 + worktree + 并行 agent
-                            + 各自跑 sdd-develop-feature + 按依赖顺序 rebase）
-                          → rebase 完成后不自动合 main，由你按合并队列决定
+                            + 各自跑 sdd-develop-feature + 每个 FR 一个 PR）
+                          → 按依赖顺序 squash 合并，合并时机由你批准
 ```
 
 **几条关键约束**（沉淀自实战，已写进对应技能的红线）：

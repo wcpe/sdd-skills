@@ -79,19 +79,19 @@ feat: 完成 MVP 第一期核心功能
 
 ## 4. 提交历史整理与合并策略（强制）
 
-### 4.1 发 PR 或合入主线前整理全部提交
+### 4.1 发 PR 前整理全部提交
 
-发 PR 或合入 `main` / `master` 前必须审查分支上的全部提交，而不只看最后一次提交或最终 diff，并按逻辑重排、归并或拆分历史：清理 `WIP`、`fixup!`、`squash!`，修正提交信息拼写，把同一实现的跟随式修复归入所属逻辑提交，并把混合无关意图、无关需求或不同 Conventional Commit 类型的过大提交拆开。整理只能在尚未共享的本地分支上进行。
+发 PR 前必须审查分支上的全部提交，而不只看最后一次提交或最终 diff，并按逻辑重排、归并或拆分历史：清理 `WIP`、`fixup!`、`squash!`，修正提交信息拼写，把同一实现的跟随式修复归入所属逻辑提交，并把混合无关意图、无关需求或不同 Conventional Commit 类型的过大提交拆开。整理只能在尚未共享的本地分支上进行。
 
 整理完成后，每个提交都必须满足单一意图、可独立理解、可独立回滚、可构建和影响范围验证门通过。开发期临时检查点可以被改写或吸收；最终逻辑提交则是供评审、合并、发布和长期追溯的稳定历史。
 
 ### 4.2 主线与 PR 合并策略
 
-- `main` 或 `master` 主线只保留最终逻辑提交，不保留 `WIP`、`fixup!`、`squash!`、拼写修补或纯跟随式修复提交。
-- 合并时优先采用能够保留整理后逻辑提交的 rebase 后 fast-forward、受控 rebase 或其他保留清晰提交序列的方式；选择方式的目标是得到可审查、可定位、可回滚的主线历史。
-- 单一意图的小型 PR 可以整理为一个逻辑提交；包含多个独立意图的 PR 必须保留为多个逻辑提交，不得为了“一 PR 一提交”强行压缩。
-- 禁止使用 Squash and merge 把整个版本压成单个提交；禁止把大型或多意图 PR 压缩成一个提交。版本历史应由多个按能力、修复、重构和治理划分的逻辑提交组成。
-- 禁止制造“完整版本一次提交”的大提交。版本号不是提交边界，发版也不能替代此前逻辑提交的整理。
+- **一律走 PR**：除只改文档（README、`docs/`、CHANGELOG 等，不含功能代码或构建逻辑）与纯版本号 bump 两类豁免外，一切变更（含 AI 代理、hotfix）都在独立分支提交并开 PR，禁止直推主线。开 PR 必须显式指定 base（`gh pr create --base <开发主线>`）。
+- **一律 squash**：PR 只用 `gh pr merge <n> --squash --delete-branch --subject "<type>(<scope>): <中文描述> (#<n>)" --body-file <总结文件>` 合并，禁止 `--merge` / `--rebase`。因此 `main` 或 `master` 主线只保留逻辑提交（一个 PR 即一条），不保留 `WIP`、`fixup!`、`squash!` 或跟随式修复。
+- **一个 PR 只做一件事**：PR 标题即 squash 后的提交标题与 Release 笔记里的一行，须是中文 Conventional Commits 且能独立读懂；包含多个独立意图的改动拆成多个 PR，而不是塞进一个 PR 再压缩。
+- **squash 提交信息**：标题手写并带 `(#<n>)`；正文用 `gh pr view <n> --json commits --jq '.commits[].messageHeadline'` 逐条核对，覆盖全部实质提交（同主题可合并成一条），不与 PR 描述雷同，纯文本、不用 Markdown 标记；feat / fix 附需求编号（如 FR-NN），无编号体系时写明理由。
+- 禁止制造“完整版本一次提交”的大提交。版本由多个按能力、修复、重构和治理划分的 PR 逐个 squash 而成，版本号不是提交边界，发版也不能替代此前逻辑提交的整理。
 
 ### 4.3 发布提交与标签
 
@@ -108,7 +108,7 @@ release commit 只包含版本号、CHANGELOG 定稿以及发布所必需的元�
 
 - 已 push、已被协作者基于其继续开发，或已被正式版本标签引用的历史禁止重写；不得对这类提交执行 rebase、squash、amend 或 force push。
 - 已发布版本发现问题时创建新的 `fix` 提交；需要撤销既有改动时优先使用 `git revert`，保留原提交与撤销原因。
-- 只有尚未共享的本地开发分支可以通过 rebase、squash、amend 等方式重排、拆分或压缩临时提交；一旦共享，改用追加提交或 revert。
+- 只有尚未共享的本地开发分支可以通过 rebase、squash、amend 等方式重排、拆分或压缩临时提交；一旦共享，改用追加提交或 revert。PR 合并时由 GitHub 生成新的 squash 提交，不属于重写公开历史；已推送的 PR 分支同步主线用 `git merge <主线>`，不 rebase 后强推。
 - 严禁对 `main` 或 `master` 执行 force push，包括 `git push --force` 与 `git push --force-with-lease`。
 
 ## 5. 文档入库边界（强制）
@@ -133,24 +133,23 @@ release commit 只包含版本号、CHANGELOG 定稿以及发布所必需的元�
 
 - 禁止跳过或绕过 hooks，包括使用 `--no-verify`；hook 失败时必须修复原因后重新提交。
 - 提交前确认未包含 `.env`、凭据、密钥、隐私数据或不应入库的大型二进制。
-- 未经用户明确要求，不自动提交、不自动推送。
+- 未经用户要求交付该变更，不自动提交、不自动推送、不开 PR。
 
-## 7. 禁止擅自开 PR 与破坏性操作（强制）
+## 7. PR 交付与破坏性操作授权（强制）
 
-### 7.1 默认禁止创建 PR
+### 7.1 变更以 PR 交付，合并须经用户批准
 
-- **默认禁止**执行 `gh pr create` / `gh pr create ...` / 任何创建 Pull Request 的 API 或等价操作。
-- **仅当**用户在**当前对话**中明确说出「开 PR」「创建 PR」「提 PR」等授权时，才允许创建。
-- 用户说「提交 / 推送 / 发版 / 修 CI / 撤回」**不等于**授权开 PR，不得借这些指令自行扩展到创建 PR。
-- 合 `main` 若被分支保护挡住：向用户报告阻塞与可选方案，**等待指示**；不得自行开 PR「绕路」。
+- 用户要求提交 / 交付一项非豁免变更时，标准动作就是：在独立分支提交 → 推送该分支 → `gh pr create --base <开发主线>` 开 PR 交用户审批；不得改为直推主线。
+- **合并须用户明确批准**：`gh pr merge`（一律 `--squash`）、`gh pr ready`、`gh pr close` 只在用户于当前对话明确同意后执行；代理不自行合并自己开的 PR。
+- 分支保护或 CI 挡住合并时：报告阻塞与可选方案并等待指示，不得绕过保护或改用 `--merge` / `--rebase` / 直推。
 - 已误开的 PR：在用户要求关闭时立即 `gh pr close`，不再追加操作。
 
 ### 7.2 只读优先，破坏性操作必须经用户同意
 
 - 代理对仓库与远端的**默认权限是只读**：查询、`status`、`diff`、`log`、`show`、`branch` 列举、`gh pr view` / `gh pr list` 等只读操作可自由执行。
 - **任何破坏性或带外部副作用的操作**，必须先向用户说明将要执行什么、为什么、影响范围，并**获得当前对话内的明确同意**后才执行。包括但不限于：
-  - `git push` / `git push --force*` / `git rebase` / `git reset --hard` / `git branch -D` / `git tag -d` / `git commit --amend` 已共享提交；
-  - `gh pr create` / `gh pr merge` / `gh pr close` / `gh pr ready` / `gh issue create` / `gh issue close`；
+  - 推送主线、`git push --force*` / `git rebase` / `git reset --hard` / `git branch -D` / `git tag -d` / `git commit --amend` 已共享提交（按 7.1 推送功能分支并开 PR 除外）；
+  - `gh pr merge` / `gh pr close` / `gh pr ready` / `gh issue create` / `gh issue close`；
   - 删除分支、删除标签、改写已 push 的历史；
   - 调用任何会触发 CI、通知、邮件、聊天推送、部署的命令。
 - 「上一次同意过」**不构成**对后续同类操作的默示授权；每个新的破坏性动作都要单独确认。

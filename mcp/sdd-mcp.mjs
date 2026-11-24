@@ -5,7 +5,7 @@ import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
-const SERVER = { name: 'sdd', version: '0.10.0' }
+const SERVER = { name: 'sdd', version: '0.11.0' }
 
 const TOOLS = [
   {
@@ -40,13 +40,13 @@ function checkDrift(args) {
     const m = line.match(/^\|\s*FR-(\d+)\s*\|(.+?)\|(.+?)\|(.+?)\|\s*$/)
     if (m) frs.push({ id: 'FR-' + m[1], desc: m[2].trim(), prio: m[3].trim(), status: m[4].trim() })
   }
-  const tags = git(dir, ['tag', '--list', 'v*']).split(/\r?\n/).filter(Boolean)
+  const tags = git(dir, ['tag', '--list']).split(/\r?\n/).filter(Boolean)
 
   const drift = []
   for (const fr of frs) {
     const dm = fr.status.match(/已交付@v?([\d.]+)/)
     if (dm && !tags.includes('v' + dm[1]) && !tags.includes(dm[1])) {
-      drift.push(`${fr.id} 标了「${fr.status}」但 tag v${dm[1]} 不存在 → 可疑预标（应由 sdd-release-version 发版时统一标）`)
+      drift.push(`${fr.id} 标了「${fr.status}」但 tag v${dm[1]} / ${dm[1]} 均不存在 → 可疑预标（应由 sdd-release-version 发版时统一标）`)
     }
   }
   const cl = join(dir, 'CHANGELOG.md')

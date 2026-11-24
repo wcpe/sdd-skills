@@ -1,0 +1,34 @@
+{
+  "PreToolUse": [
+    {
+      "matcher": "^exec$",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\"; if [ -f \"$f\" ]; then sh \"$f\" guard-commit.js; fi"
+        }
+      ]
+    }
+  ],
+  "PostToolUse": [
+    {
+      "matcher": "^(edit|write|apply_patch)$",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\"; if [ -f \"$f\" ]; then sh \"$f\" guard-adr.js; fi"
+        }
+      ]
+    }
+  ],
+  "Stop": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\"; if [ -f \"$f\" ]; then sh \"$f\" nudge-doc-sync.js; fi"
+        }
+      ]
+    }
+  ]
+}
