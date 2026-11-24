@@ -4,7 +4,10 @@
       {
         "matcher": "Bash",
         "hooks": [
-          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/guard-commit.js\"" }
+          {
+            "type": "command",
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\"; if [ -f \"$f\" ]; then sh \"$f\" guard-commit.js; fi"
+          }
         ]
       }
     ],
@@ -12,14 +15,20 @@
       {
         "matcher": "Edit|Write|MultiEdit",
         "hooks": [
-          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/guard-adr.js\"" }
+          {
+            "type": "command",
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\"; if [ -f \"$f\" ]; then sh \"$f\" guard-adr.js; fi"
+          }
         ]
       }
     ],
     "Stop": [
       {
         "hooks": [
-          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/nudge-doc-sync.js\"" }
+          {
+            "type": "command",
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\"; if [ -f \"$f\" ]; then sh \"$f\" nudge-doc-sync.js; fi"
+          }
         ]
       }
     ]
