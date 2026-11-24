@@ -8,7 +8,7 @@ const repoRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const canonicalTemplatePath = 'skills/init-sdd-project/templates/';
 const historyHeading = '## 4. 提交历史整理与合并策略（强制）';
 const contributingHeading = '### 8.1 提交历史治理（摘要）';
-const rulesIndexLine = '| [git-commit.md](git-commit.md) | **提交信息规范**、**逻辑提交粒度**、**主线历史整理**、**文档入库边界**与**禁止擅自开 PR / 破坏性操作** |';
+const rulesIndexLine = '| [git-commit.md](git-commit.md) | **提交信息规范**、**逻辑提交粒度**、**主线历史整理（一律 PR + squash）**、**文档入库边界**与**PR 交付 / 破坏性操作授权** |';
 
 function readRepo(...segments) {
   return readFileSync(path.join(repoRoot, ...segments), 'utf8');
@@ -141,13 +141,18 @@ test('权威提交规则完整约束开发提交与公开历史治理', () => {
   );
   assertParagraphWithTerms(
     gitCommitRule,
-    [/(?:禁止|不得|不要|严禁)/, /(?:整个|完整).{0,8}版本/, /(?:squash|压缩|压成|合并)/i, /(?:单个|一个|一条).{0,4}提交/],
-    '必须禁止把整个版本 squash 成单提交',
+    [/(?:禁止|不得|不要|严禁)/, /(?:整个|完整).{0,8}版本/, /(?:一次提交|大提交)/],
+    '必须禁止整版本一次提交',
   );
   assertParagraphWithTerms(
     gitCommitRule,
-    [/(?:禁止|不得|不要|严禁)/, /(?:大型|大规模|多意图).{0,12}(?:PR|合并请求)/i, /(?:squash|压缩|压成|合并)/i, /(?:单个|一个|一条).{0,4}提交/],
-    '必须禁止把大型多意图 PR squash 成单提交',
+    [/一律走 PR/, /(?:禁止|不得)/, /直推主线/, /--base/],
+    '必须要求非豁免变更一律走 PR 且显式指定 base',
+  );
+  assertParagraphWithTerms(
+    gitCommitRule,
+    [/一律 squash/, /gh pr merge <n> --squash --delete-branch/, /\(#<n>\)/, /禁止 `--merge` \/ `--rebase`/],
+    '必须要求一律 squash 合并并禁用 --merge / --rebase',
   );
   assertParagraphWithTerms(
     gitCommitRule,
@@ -253,30 +258,29 @@ test('发布技能创建独立 release 提交和附注 tag 且不改写前序提
   );
 });
 
-test('治理文本不推荐把整个版本或大型多意图 PR squash 成单提交', () => {
-  const markdownFiles = listMarkdownFiles(path.join(repoRoot, 'skills'));
-  const suspectParagraphs = [];
-
-  for (const file of markdownFiles) {
-    for (const paragraph of paragraphs(readFileSync(file, 'utf8'))) {
-      const mentionsLargeUnit = /(?:整个|完整).{0,8}版本|(?:大型|大规模|多意图).{0,12}(?:PR|合并请求)/i.test(paragraph);
-      const mentionsSquash = /(?:squash|压缩|压成|合并成|合并为)/i.test(paragraph);
-      const mentionsSingleCommit = /(?:单个|一个|一条).{0,4}提交/.test(paragraph);
-
-      if (mentionsLargeUnit && mentionsSquash && mentionsSingleCommit) {
-        suspectParagraphs.push([toRepoPath(file), paragraph]);
-      }
+test('治理文本不再推荐 rebase / fast-forward / merge 合并或禁止 squash', () => {
+  const forbidden = [
+    /禁止使用 Squash and merge/,
+    /rebase 后 fast-forward/,
+    /--ff-only/,
+    /--no-ff/,
+    /(?:禁止|不得).{0,12}(?:大型|多意图).{0,12}PR.{0,8}(?:squash|压缩)/i,
+    /默认禁止创建 PR/,
+  ];
+  for (const file of listMarkdownFiles(path.join(repoRoot, 'skills'))) {
+    const content = readFileSync(file, 'utf8');
+    for (const pattern of forbidden) {
+      assert.doesNotMatch(content, pattern, `${toRepoPath(file)} 仍含与「一律走 PR、一律 squash」冲突的旧规则`);
     }
   }
+});
 
-  assert.ok(suspectParagraphs.length > 0, '必须明确记录禁止整版本或大型 PR squash 的治理文本');
-  for (const [file, paragraph] of suspectParagraphs) {
-    assert.match(
-      paragraph,
-      /(?:禁止|不得|不要|不应|严禁|反对|避免)/,
-      `${file} 出现了推荐大型 squash 的相反建议`,
-    );
-  }
+test('sync 原地升级旧版 git-commit 索引行，不插入重复行', () => {
+  assertParagraphWithTerms(
+    syncSkill,
+    [/\| \[git-commit\.md\]\(git-commit\.md\) \|/, /原地改写/, /不新增第二行/, /恰好一行/],
+    'sync 必须以行首锚点原地升级旧版索引行',
+  );
 });
 
 test('关键治理文本使用简体中文且不存在实际 AI 或作者 footer', () => {

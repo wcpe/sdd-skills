@@ -95,8 +95,9 @@
 - 开发分支应频繁提交安全检查点，不得长期堆积未提交变更；`fixup!`、`squash!` 只可作为合并前会被整理掉的临时标记。
 - 合并前审查全部提交，清理 WIP、临时标记、拼写问题和跟随修复；过大或多意图提交按逻辑拆分。
 - 最终逻辑提交必须单一意图、不混类型、可独立理解、可独立回滚、可构建，并通过影响范围内的测试与质量验证门；边界不按文件、时间、阶段或版本机械划分。
-- `main` / `master` 只保留逻辑提交，合并优先采用保留这些提交的 rebase / fast-forward 等方式。一个需求允许由多个逻辑提交组成；小型单意图 PR 可以是一条提交，多意图 PR 必须保留多条提交。
-- 禁止把整个版本或大型多意图 PR squash 成一个提交，也禁止整版本大提交。
+- 一律走 PR：除纯文档与纯版本号 bump 外，所有变更在独立分支提交并开 PR（显式指定 base），禁止直推 `main` / `master`。
+- 一律 squash：PR 只用 `gh pr merge <n> --squash --delete-branch` 合并、标题手写带 `(#<n>)`，禁止 `--merge` / `--rebase`；主线一个 PR 即一条逻辑提交，所以一个 PR 只做一件事，多意图拆成多个 PR。
+- 禁止整版本大提交：版本由多个 PR 逐个 squash 而成。
 - 版本由多个逻辑提交组成；发版另建只含版本号、CHANGELOG 和发布元数据的 `chore(release): 发布 X.Y.Z`，并创建 `vX.Y.Z` tag。
 - 公开、已推送、已被协作者依赖或已被正式版本标签引用的历史不得 rebase、squash、amend 或 force push；问题用新 `fix`，撤销用 `git revert`，只有未共享本地分支可以整理。
 - 严禁 force push `main` / `master`；不得跳过 hooks。提交信息继续遵循 Conventional Commits、英文小写 type/scope、简体中文标题正文且禁止 AI 尾注。

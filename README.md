@@ -38,7 +38,7 @@
 | `sdd-accept-phase` | 验收：整期 / 当前版本待发 / 当前一批改动（scope 三选一，发布·合并就绪审计） |
 | `sdd-realign-prd` | PRD 结构 / 状态不合规时的诊断 + 工单（不亲自改） |
 | `sdd-review-code` | 代码质量 / bug / 安全审查 → 分级 findings + 路由（不亲自改） |
-| `sdd-parallel-develop` | 并行开发多个 FR（依赖分析 + worktree + 并行 agent + 自动 rebase） |
+| `sdd-parallel-develop` | 并行开发多个 FR（依赖分析 + worktree + 并行 agent + 每个 FR 一个 PR、squash 合并） |
 | `sdd-sync-governance` | 把**上游更新的治理模板**（`.claude/rules`/CONTRIBUTING/specs 模板…）对账并回现有项目 |
 
 > 这些技能只引用项目内的相对路径（`docs/PRD.md`、`.claude/rules/*` 等），装在哪都按"当前项目"解析——所以可全局共享，且更新时无需逐项目同步。（`sdd-sync-governance` 例外：它还要读插件自带的权威模板与项目对账，正是用来弥补"模板拷进项目后不随插件更新"这一缺口。）
@@ -369,8 +369,8 @@ sdd-skills/                         ← 仓库根 = 插件本体（Claude 经 wc
                           → 清零后 sdd-accept-phase 复核基于规范 PRD 的状态
                           ※ 详见下方「PRD 不规范 / 结构错位 怎么纠正」
    批量并行开多个 FR ────► sdd-parallel-develop（依赖分析 + worktree + 并行 agent
-                            + 各自跑 sdd-develop-feature + 按依赖顺序 rebase）
-                          → rebase 完成后不自动合 main，由你按合并队列决定
+                            + 各自跑 sdd-develop-feature + 每个 FR 一个 PR）
+                          → 按依赖顺序 squash 合并，合并时机由你批准
 ```
 
 **几条关键约束**（沉淀自实战，已写进对应技能的红线）：

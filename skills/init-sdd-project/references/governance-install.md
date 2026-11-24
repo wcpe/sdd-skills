@@ -53,4 +53,4 @@
 - [ ] `docs/PRD.md` §4 FR 表为四列 `| FR-NN | 需求 | 优先级 | 状态 |`，可被 `sdd_check_drift` 解析；有该 MCP 工具时跑一次，确认无漂移信号。
 - [ ] `.tmp/` 已被忽略：`git check-ignore -q .tmp/x` 成功；`git status` 中没有 `.tmp/` 下文件。
 - [ ] 生成的文档内部链接（README → CONTRIBUTING / LICENSE、rules README → CONTRIBUTING）都能打开。
-- [ ] 提交遵循项目 `.claude/rules/git-commit.md`：中文 Conventional Commits、不自动 push、未经当前对话授权不开 PR。
+- [ ] 提交遵循项目 `.claude/rules/git-commit.md`：中文 Conventional Commits；用户要求交付时在独立分支提交并开 PR（非豁免变更不直推主线），合并一律 squash 且须用户批准。

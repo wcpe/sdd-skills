@@ -43,7 +43,7 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 
 ### 5. 收尾
 - 逐项过共用参考 §5 收尾验收清单，并用 `git status --short`（含已暂存）确认待提交内容只有治理文档 / 规则 / 配置、没有业务代码改动；提交时按路径显式 `git add` 治理文件，不用 `git add -A` / `git commit -a`。
-- **不自动 push**；中文提交（`docs: 引入 SDD 治理` / `chore: 落地 SDD 脚手架`）。提交、分支与是否开 PR 按项目 `.claude/rules/git-commit.md`（及步骤 4 沿用的既有约定）执行：主线受保护或项目要求走 PR 时在独立分支提交，开 PR 须经用户在当前对话明确授权。
+- **不自动 push**；中文提交（`docs: 引入 SDD 治理` / `chore: 落地 SDD 脚手架`）。用户要求交付时按项目 `.claude/rules/git-commit.md` §4.2 / §7.1：在独立分支提交、开 PR 交用户审批，合并一律 squash；项目已有且用户确认保留的不同约定（步骤 4）优先。
 - 给用户"接下来"：以后加功能/修复/重构走全局 `sdd-*` 技能（`sdd-develop-feature` 等），文档随代码同步（`doc-sync`）；想先系统性排查问题可用 `sdd-review-code`。
 - **逆向期间 / 之后若有绕过流程的提交进来**（队友直推、CI、合并、逆向窗口内的新 commit）→ 用 `sdd-reconcile-external-commits` 增量同步文档。
 
