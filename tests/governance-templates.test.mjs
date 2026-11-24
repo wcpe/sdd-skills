@@ -307,7 +307,7 @@ test('关键治理文本使用简体中文且不存在实际 AI 或作者 footer
 
 test('sdd-skills 版本戳文件与插件清单版本一致', () => {
   const stamp = readRepo('skills', 'init-sdd-project', 'references', 'sdd-skills-version.txt').trim();
-  for (const manifest of ['.claude-plugin', '.codex-plugin']) {
+  for (const manifest of ['.claude-plugin', '.codex-plugin', '.devin-plugin']) {
     const { version } = JSON.parse(readRepo(manifest, 'plugin.json'));
     assert.equal(stamp, version, `${manifest}/plugin.json 版本必须与 references/sdd-skills-version.txt 一致`);
   }
@@ -328,5 +328,28 @@ test('init 与 retrofit 共用安装参考，访谈提供的许可均有模板',
       existsSync(path.join(repoRoot, 'skills', 'init-sdd-project', 'templates', 'licenses', `${license}.txt`)),
       `缺少许可模板 ${license}.txt`,
     );
+  }
+});
+
+test('hook 经启动器调用，Devin 与 Claude 两份配置指向同一组脚本', () => {
+  const claudeHooks = JSON.parse(readRepo('hooks', 'hooks.json')).hooks;
+  const devinHooks = JSON.parse(readRepo('hooks.json'));
+  for (const hooks of [claudeHooks, devinHooks]) {
+    for (const event of ['PreToolUse', 'PostToolUse', 'Stop']) {
+      for (const entry of hooks[event]) {
+        for (const hook of entry.hooks) {
+          assert.match(hook.command, /hooks\/run-hook\.sh/, `${event} 必须经 run-hook.sh 启动`);
+          assert.doesNotMatch(hook.command, /^node\b/, `${event} 不得直接依赖 PATH 里的 node`);
+        }
+      }
+    }
+  }
+  assert.ok(existsSync(path.join(repoRoot, 'hooks', 'run-hook.sh')));
+});
+
+test('斜杠命令 /sdd 与 /sdd-status 有对应技能', () => {
+  for (const name of ['sdd', 'sdd-status']) {
+    const skill = readRepo('skills', name, 'SKILL.md');
+    assert.match(skill, new RegExp(`^---\\nname: ${name}\\n`), `${name} 技能 frontmatter name 必须一致`);
   }
 });

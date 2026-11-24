@@ -8,7 +8,10 @@
 
 - **Claude Code**：`commands/` 提供 `/sdd` 路由、`/sdd-status` 以及所有 workflow 快捷入口；`hooks/` 提供提交门、ADR 不可变提醒、文档同步提醒；`.mcp.json` 暴露 `sdd_check_drift`。
 - **OpenAI Codex**：`.codex-plugin/plugin.json`、`agents/openai.yaml`、`assets/` 和 `skills/*/agents/openai.yaml` 提供插件页、图标、能力说明、workflow skill cards 与默认 prompt；`.mcp.json` 暴露 `sdd_check_drift`。
+- **Devin**：`.devin-plugin/plugin.json` 为清单，加载全部技能（含 `sdd` 入口与 `sdd-status`，替代 Devin 不加载的斜杠命令）、根目录 `hooks.json`（护栏 hook，匹配 Devin 的 `exec` / `edit` / `write` 工具名）与 `.mcp.json` 的 `sdd_check_drift`。
 - **opencode**：使用通用 `skills/`，不加载 Claude/Codex 插件专属增强。
+
+护栏 hook 一律经 `hooks/run-hook.sh` 启动：hook 进程拿不到交互 shell 的 PATH 时（如 Devin 云端），它按常见安装位置查找 `node`，找不到 `node` 或插件根时静默放行，不会以 exit 127 报错。
 
 ## 脚手架技能（一次性套上 SDD）
 
@@ -102,6 +105,10 @@ cp -r sdd-skills/skills/* ~/.codex/skills/          # 全局：所有项目可�
 
 插件模式优先，因为它能同时带上 `.mcp.json`、`agents/openai.yaml` 与展示资产。
 
+### Devin
+
+在 Devin 的插件设置里从 GitHub 安装 `wcpe/sdd-skills`（个人或组织范围均可），或在 Devin CLI 里 `devin plugins install wcpe/sdd-skills`。技能以 `/sdd-skills:<技能名>` 暴露；hook 与 MCP 随插件生效，改动对新会话生效。
+
 ### opencode
 
 opencode 原生认 `SKILL.md`（并兼容 `.claude/skills/`），靠**目录发现**、没有 skill 安装命令——把技能拷进它扫描的目录即可：
@@ -120,6 +127,9 @@ cp -r sdd-skills/skills/* ~/.config/opencode/skills/   # 全局：所有项目�
 sdd-skills/                         ← 仓库根 = 插件本体（Claude 经 wcpe/claude-plugins，Codex 经 wcpe/codex-plugins）
 ├── .claude-plugin/                 Claude Code 插件清单
 │   └── plugin.json
+├── .devin-plugin/                  Devin 插件清单（hooks 见根目录 hooks.json）
+│   └── plugin.json
+├── hooks.json                      Devin 护栏 hook（Claude 用 hooks/hooks.json）
 ├── .codex-plugin/                  Codex 插件清单
 │   └── plugin.json                 skills 指向 ./skills/，MCP 指向 ./.mcp.json
 ├── agents/                         Codex 插件级展示元数据

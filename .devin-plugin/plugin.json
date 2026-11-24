@@ -1,0 +1,16 @@
+{
+  "name": "sdd-skills",
+  "version": "0.10.0",
+  "description": "规格驱动开发（SDD）技能集：init-sdd-project / retrofit-to-sdd 两个脚手架技能、sdd 工作流入口与 sdd-status 进度漂移汇报，外加 16 个 sdd-* 迭代工作流技能；附防漂移护栏 hook（提交门 / ADR 不可变 / 文档同步，仅 SDD 项目生效）与 MCP 工具 sdd_check_drift。",
+  "author": {
+    "name": "wcpe"
+  },
+  "homepage": "https://github.com/wcpe/sdd-skills",
+  "repository": "https://github.com/wcpe/sdd-skills",
+  "keywords": [
+    "sdd",
+    "spec-driven-development",
+    "governance",
+    "skills"
+  ]
+}
