@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\"; if [ -f \"$f\" ]; then sh \"$f\" guard-commit.js; fi"
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\"; if [ -f \"$f\" ]; then sh \"$f\" --host claude guard-commit.js; fi"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\"; if [ -f \"$f\" ]; then sh \"$f\" guard-adr.js; fi"
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\"; if [ -f \"$f\" ]; then sh \"$f\" --host claude guard-adr.js; fi"
           }
         ]
       }
@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\"; if [ -f \"$f\" ]; then sh \"$f\" nudge-doc-sync.js; fi"
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\"; if [ -f \"$f\" ]; then sh \"$f\" --host claude nudge-doc-sync.js; fi"
           }
         ]
       }
