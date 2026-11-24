@@ -8,7 +8,7 @@ const repoRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const canonicalTemplatePath = 'skills/init-sdd-project/templates/';
 const historyHeading = '## 4. 提交历史整理与合并策略（强制）';
 const contributingHeading = '### 8.1 提交历史治理（摘要）';
-const rulesIndexLine = '| [git-commit.md](git-commit.md) | **提交信息规范**、**逻辑提交粒度**、**主线历史整理**与**文档入库边界** |';
+const rulesIndexLine = '| [git-commit.md](git-commit.md) | **提交信息规范**、**逻辑提交粒度**、**主线历史整理**、**文档入库边界**与**禁止擅自开 PR / 破坏性操作** |';
 
 function readRepo(...segments) {
   return readFileSync(path.join(repoRoot, ...segments), 'utf8');
@@ -204,7 +204,7 @@ test('CONTRIBUTING 摘要提交历史治理并链接权威规则', () => {
   );
 });
 
-test('规则 README 索引覆盖提交治理的四个边界', () => {
+test('规则 README 索引覆盖提交治理的边界与禁止擅自开 PR', () => {
   assert.ok(
     rulesReadme.split(/\r?\n/).includes(rulesIndexLine),
     'git-commit.md 索引行必须逐字包含四项治理边界',
