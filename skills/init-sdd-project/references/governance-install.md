@@ -24,6 +24,7 @@
 | `gitignore-templates/<stack>.gitignore` | `.gitignore` | 无对应栈见 §4 |
 | `licenses/<许可>.txt` | `LICENSE` | `MIT` / `Apache-2.0` / `PROPRIETARY`（内部保留所有权利）；Apache-2.0 原文不改，版权声明写进 `NOTICE` 或 README |
 | `VERSION` | `VERSION` | |
+| `privacy-guard.json` | `.privacy-guard.json` | 隐私扫描配置（可选依赖 privacy-guard，见 `references/privacy-guard.md`）；已存在则保留项目的豁免与规则，只补缺失字段 |
 
 迭代技能（`sdd-*`）随 sdd-skills 插件一同提供、所有 SDD 项目共享，**不拷进项目**，项目侧不放 `.claude/skills/`。
 
@@ -55,4 +56,5 @@
 - [ ] `docs/PRD.md` §4 FR 表为四列 `| FR-NN | 需求 | 优先级 | 状态 |`，可被 `sdd_check_drift` 解析；有该 MCP 工具时跑一次，确认无漂移信号。
 - [ ] `.tmp/` 已被忽略：`git check-ignore -q .tmp/x` 成功；`git status` 中没有 `.tmp/` 下文件。
 - [ ] 生成的文档内部链接（README → CONTRIBUTING / LICENSE、rules README → CONTRIBUTING）都能打开。
+- [ ] `.privacy-guard.json` 已落地；装了 privacy-guard 时按 `references/privacy-guard.md` 扫一次并处理 critical，没装就在交付说明里写明「未安装，已跳过」并附安装提示。
 - [ ] 提交遵循项目 `.claude/rules/git-commit.md`：中文 Conventional Commits；用户要求交付时在独立分支提交并开 PR（非豁免变更不直推主线），合并一律 squash 且须用户批准。

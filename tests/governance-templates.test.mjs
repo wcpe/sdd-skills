@@ -397,3 +397,18 @@ test('读取根目录 ARCHITECTURE / CONTRIBUTING 的迭代技能兼容旧布局
     );
   }
 });
+
+test('privacy-guard 以可选依赖接入：模板合法、安装映射与各节点技能都引用共用参考并写明未安装时跳过', () => {
+  const tpl = JSON.parse(readFileSync(path.join(repoRoot, 'skills/init-sdd-project/templates/privacy-guard.json'), 'utf8'));
+  assert.equal(tpl.fail_on, 'major');
+  const ref = readFileSync(path.join(repoRoot, 'skills/init-sdd-project/references/privacy-guard.md'), 'utf8');
+  assert.match(ref, /可选依赖/);
+  assert.match(ref, /跳过不算失败/);
+  const install = readFileSync(path.join(repoRoot, 'skills/init-sdd-project/references/governance-install.md'), 'utf8');
+  assert.match(install, /`privacy-guard\.json` \| `\.privacy-guard\.json`/);
+  for (const skill of ['retrofit-to-sdd', 'sdd-accept-phase', 'sdd-release-version', 'sdd-review-code']) {
+    const body = readFileSync(path.join(repoRoot, 'skills', skill, 'SKILL.md'), 'utf8');
+    assert.match(body, /\.\.\/init-sdd-project\/references\/privacy-guard\.md/, `${skill} 要引用共用参考`);
+    assert.match(body, /没装/, `${skill} 要写明未安装时的处理`);
+  }
+});

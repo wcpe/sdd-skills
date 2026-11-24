@@ -8,6 +8,8 @@
 ## 2. 密钥与敏感数据
 <密钥 / 令牌 / 凭据如何存放与轮换；严禁硬编码与入库；日志脱敏要求。>
 
+隐私扫描：项目根 `.privacy-guard.json` 是 [privacy-guard](https://github.com/wcpe/privacy-guard-skill) 的扫描配置（豁免须写理由，基线 `.privacy-guard-baseline.json` 只存指纹）。验收与发版会扫本版新增内容，critical 阻断。
+
 ## 3. 外部输入
 <所有外部输入的校验 / 转义策略，防注入与越权。>
 
