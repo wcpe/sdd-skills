@@ -5,7 +5,7 @@ description: 读 docs/PRD.md 的 FR 表汇报每条 FR 状态、标出漂移信�
 汇报当前 SDD 项目的进度与漂移（**只读，不改任何文件**）。
 
 1. 读 `docs/PRD.md §4` FR 表，列每条 FR：编号 / 一句话能力 / 优先级 / 状态（计划 | 开发中 | 已交付@vX.Y.Z）。
-2. 读 git：`git tag --list "v*"`、`git log --oneline -20`。
+2. 读 git：`git tag --list`（含不带 v 前缀的旧标签）、`git log --oneline -20`。
 3. 标**漂移信号**：
    - FR 标「已交付@vX.Y.Z」但 `vX.Y.Z` tag 不存在 / git 无对应提交 → 可疑预标。
    - FR「开发中」但近期无相关提交 → 停滞。

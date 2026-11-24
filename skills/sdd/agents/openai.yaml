@@ -1,0 +1,5 @@
+interface:
+  display_name: "SDD"
+  short_description: "Route a request to the right SDD workflow skill."
+  brand_color: "#2F6FED"
+  default_prompt: "Use $sdd to figure out which SDD workflow fits this request."

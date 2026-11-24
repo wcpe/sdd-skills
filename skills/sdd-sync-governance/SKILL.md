@@ -23,17 +23,19 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。当 sd
 
 ### 1. 读来源戳、定版本差
 - 读项目 `.claude/rules/.sdd-version` 拿到 init 时的 sdd-skills 版本 / commit。**无戳**（老项目）→ 当作未知，做 best-effort 全量对账，并提醒用户本次同步后即写入戳记、以后改走增量。
-- 读插件当前版本（`${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` 的 `version`）。版本相同且无改动 → 告知"已最新"，结束。
+- 读插件当前版本（`skills/init-sdd-project/references/sdd-skills-version.txt`，随技能目录分发、任何安装方式都可读；插件根是 git 检出时再取 `HEAD` commit）。版本与 commit 都相同 → 告知"已最新"，结束；取不到 commit（拷贝安装 / 无戳 commit）时版本相同不足以证明模板未变，仍按步骤 2 逐文件比对，无差异才报"已最新"。
 
 ### 2. 逐文件对账
-- 权威模板固定为 `skills/init-sdd-project/templates/`（Claude Code 下 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/`；Codex / opencode 下从技能根定位同一路径），不得从其他副本反向同步。模板 `claude-rules/README.md` 对应项目 `.claude/rules/README.md`，其他文件按 init 的既有映射逐一对账。
+- 权威模板固定为 `skills/init-sdd-project/templates/`（Claude Code 下 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/`；Codex / opencode 下从技能根定位同一路径），不得从其他副本反向同步。模板 `claude-rules/README.md` 对应项目 `.claude/rules/README.md`，其他文件按共用参考 `skills/init-sdd-project/references/governance-install.md` §2 的安装映射定位，但**只对账上文「能干净同步」范围与 `AGENTS.md` 入口段**；`LICENSE`、`VERSION`、`.gitignore`、`.editorconfig`、`.github/` 与 `docs/_skeletons/*` 生成的项目文档属于一次性脚手架安装项，不列为同步候选（含 `AGENTS.md` 入口段：项目缺失时作为上游新增文件处理，已存在时只补入口段）。
+- **先做布局迁移**：旧版 init / retrofit 把 `ARCHITECTURE.md`、`CONTRIBUTING.md` 放在 `docs/`，现在落仓库根。项目里只有 `docs/` 下那份时，把它视为同一文件（不是“上游新增 + 项目删除”），经用户确认后 `git mv` 到仓库根，并修正 README、`docs/adr/README.md`、`.claude/rules/*`、`AGENTS.md`、`.github/` 模板里指向它的相对链接，再按新路径对账；根目录与 `docs/` 都有时列入冲突清单问用户，不自动合并或删除。
 - 对每个映射先区分四种状态：已有文件的章节增量、上游新增文件、上游删除文件、冲突；不得把“文件不同”直接等同于“整文件替换”。
 - **三方合并优先**：插件是 git 检出且含戳记 commit 时，用 `git -C <插件根> show <戳记commit>:<模板路径>` 取 base，精确分清“上游改的”与“项目改的”。
 - 取不到 base（非 git / 拷贝安装 / 无戳）→ 继续做**两方降级对账**：project（项目文件）与 upstream（当前模板）逐章节比较，按锚点判断通用治理正文增量与项目填充；不能确认归属时按冲突处理，不因缺少 base 而整文件覆盖。
 
 ### 3. 应用章节级增量（保留项目定制）
 - 只把 upstream 新增或改写的**通用治理章节、条款、索引行**按标题、相邻标题、表头或既有条款等稳定锚点并入对应位置；占位、项目填充、`architecture-invariants`、`testing-and-quality §2` 一字不动，绝不整文件覆盖。
-- 旧项目若缺少 `git-commit.md` 的完整标题锚点 `## 4. 提交历史整理与合并策略（强制）`、`CONTRIBUTING.md` 的完整标题锚点 `### 8.1 提交历史治理（摘要）`，或 `.claude/rules/README.md` 中包含“提交信息规范、逻辑提交粒度、主线历史整理、文档入库边界”的 `git-commit.md` 索引行，将其视为 upstream 新增的通用章节或索引行，展示插入锚点与拟新增正文后再做增量插入；不得借此重排或改写相邻项目内容。
+- 旧项目若缺少 `git-commit.md` 的完整标题锚点 `## 4. 提交历史整理与合并策略（强制）`、`CONTRIBUTING.md` 的完整标题锚点 `### 8.1 提交历史治理（摘要）`，将其视为 upstream 新增的通用章节，展示插入锚点与拟新增正文后再做增量插入；不得借此重排或改写相邻项目内容。
+- `.claude/rules/README.md` 的 `git-commit.md` 索引行以行首 `| [git-commit.md](git-commit.md) |` 为锚点：已有该行但描述是旧版（如四项描述“提交信息规范、逻辑提交粒度、主线历史整理、文档入库边界”，或含“禁止擅自开 PR”）时**原地改写这一行**为上游描述，不新增第二行；完全没有该行才按表格位置插入。改写后该文件里以此锚点开头的行必须恰好一行。
 - 若同名章节、同一条款或对应索引已经存在但内容不同，判定为**冲突**：列出 `base`、`project`、`upstream` 三方差异；取不到 base 时明确标为缺失并列出 project / upstream 两方差异，然后停下询问用户，禁止静默覆盖。
 - upstream 新增文件只列为候选，说明目标路径与用途，获得用户确认后才创建；upstream 删除文件只报告删除事实和项目当前状态，不自动删除项目文件。
 - 其他拿不准归属或锚点的差异同样按冲突处理，停下来问，不臆测覆盖。
@@ -45,7 +47,7 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。当 sd
 - 同步完，把 `.claude/rules/.sdd-version` 更新为当前版本 / commit + 日期，下次增量从这里起。
 
 ### 6. 验证与提交
-- 验证每个新增章节、条款或索引行都落在记录的锚点之后，尤其逐字检查完整标题“提交历史整理与合并策略（强制）”“提交历史治理（摘要）”及规则 README 中“提交信息规范、逻辑提交粒度、主线历史整理、文档入库边界”的索引描述；同时逐项确认原有项目定制、占位填充和受保护章节仍在且内容未变。
+- 验证每个新增章节、条款或索引行都落在记录的锚点之后，尤其逐字检查完整标题“提交历史整理与合并策略（强制）”“提交历史治理（摘要）”及规则 README 中 `git-commit.md` 索引行与上游逐字一致且只有一行；同时逐项确认原有项目定制、占位填充和受保护章节仍在且内容未变。
 - `grep -rn '<[^>]*>'` 自查没把模板占位带回项目；复核变更清单中没有整文件替换、未确认的新文件或自动删除。
 - 中文提交 `chore: 同步 sdd 治理模板到 vX`，列出动了哪些规则；不自动 push。
 
