@@ -5,7 +5,7 @@ import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
-const SERVER = { name: 'sdd', version: '0.12.0' }
+const SERVER = { name: 'sdd', version: '0.13.0' }
 
 const TOOLS = [
   {
