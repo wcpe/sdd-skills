@@ -12,6 +12,8 @@ function findSddRoot (start) {
   let dir = path.resolve(start || process.cwd())
   for (;;) {
     if (isSddRoot(dir)) return dir
+    // 到达 git 仓库 / 子模块边界（.git 目录或文件）仍不是 SDD 根：不再向外层项目借用规则
+    if (fs.existsSync(path.join(dir, '.git'))) return null
     const parent = path.dirname(dir)
     if (parent === dir) return null
     dir = parent
