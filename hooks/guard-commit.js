@@ -1,19 +1,22 @@
 #!/usr/bin/env node
 'use strict'
-// SDD 提交信息门（PreToolUse: Bash）。仅在 SDD 项目（cwd 有 docs/PRD.md + .claude/rules/）里生效。
-// 拦下（exit 2 阻断提交）：AI 署名、阶段/批次词、非 Conventional Commits 标题、描述非中文。
+// SDD 提交信息门（PreToolUse: Claude 的 Bash / Devin 的 exec）。仅在 SDD 项目（docs/PRD.md + .claude/rules/）里生效。
+// 拦下（exit 2 + stdout decision:block 阻断提交）：AI 署名、阶段/批次词、非 Conventional Commits 标题、描述非中文。
 // 规则真源：.claude/rules/git-commit.md。提取不到提交信息（如开编辑器）则放行，绝不误拦。
-const fs = require('fs')
-let raw = ''
-process.stdin.setEncoding('utf8')
-process.stdin.on('data', function (c) { raw += c })
-process.stdin.on('end', function () {
-  let input
-  try { input = JSON.parse(raw || '{}') } catch (e) { process.exit(0) }
-  // 仅 SDD 项目生效，普通项目完全不碰
-  if (!fs.existsSync('docs/PRD.md') || !fs.existsSync('.claude/rules')) process.exit(0)
-  const cmd = String((input.tool_input || {}).command || '')
+const path = require('path')
+const { findSddRoot, readStdin, emit } = require('./sdd-hook-lib')
+
+readStdin(function (input) {
+  const ti = input.tool_input || {}
+  const cmd = String(ti.command || '')
   if (!/\bgit\s+commit\b/.test(cmd)) process.exit(0)
+
+  // 命令实际运行目录：Devin exec 的 workdir 参数、命令开头的 `cd <dir> &&`，否则为 hook 的 cwd
+  let dir = String(ti.workdir || ti.cwd || process.cwd())
+  const cd = cmd.match(/^\s*cd\s+("[^"]+"|'[^']+'|[^\s;&|]+)\s*&&/)
+  if (cd) dir = path.resolve(dir, cd[1].replace(/^["']|["']$/g, ''))
+  // 仅 SDD 项目生效，普通项目完全不碰
+  if (!findSddRoot(dir)) process.exit(0)
 
   // 提取提交信息：heredoc 优先（git commit -m "$(cat <<'EOF' ... EOF)"），否则 -m "..." / -m '...'
   let msg = ''
@@ -28,7 +31,9 @@ process.stdin.on('end', function () {
 
   const title = (msg.split('\n').find(function (l) { return l.trim() }) || '').trim()
   const fail = function (why) {
-    console.error('[SDD 提交门] ' + why + '\n规则见 .claude/rules/git-commit.md。改好提交信息再提交。')
+    const reason = '[SDD 提交门] ' + why + '\n规则见 .claude/rules/git-commit.md。改好提交信息再提交。'
+    emit({ decision: 'block', reason: reason })
+    console.error(reason)
     process.exit(2)
   }
 

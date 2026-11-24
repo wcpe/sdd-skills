@@ -4,7 +4,7 @@
 
 ## 1. 模板定位与版本戳
 
-- 权威模板源固定为 `skills/init-sdd-project/templates/`：Claude Code 下为 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/`；Codex / opencode / 其他按技能目录安装的工具，从当前技能目录用 `../init-sdd-project/templates/` 定位。
+- 权威模板源固定为 `skills/init-sdd-project/templates/`：Claude Code 下为 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/`；Devin / Codex / opencode / 其他按技能目录安装的工具，从当前技能目录用 `../init-sdd-project/templates/` 定位。
 - sdd-skills 版本读 `init-sdd-project/references/sdd-skills-version.txt`（随技能目录分发，插件安装与直接拷贝技能目录都能读到；与 `.claude-plugin/plugin.json`、`.codex-plugin/plugin.json` 的 `version` 由仓库测试保证一致）。
 - 插件根是 git 检出时，再用 `git -C <插件根> rev-parse HEAD` 取 commit；取不到就只记版本。
 - 写 `.claude/rules/.sdd-version`，内容为版本、commit（可空）、日期、来源技能（`init-sdd-project` / `retrofit-to-sdd`），供 `sdd-sync-governance` 日后增量升级。

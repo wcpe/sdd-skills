@@ -26,7 +26,7 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。当 sd
 - 读插件当前版本（`skills/init-sdd-project/references/sdd-skills-version.txt`，随技能目录分发、任何安装方式都可读；插件根是 git 检出时再取 `HEAD` commit）。版本与 commit 都相同 → 告知"已最新"，结束；取不到 commit（拷贝安装 / 无戳 commit）时版本相同不足以证明模板未变，仍按步骤 2 逐文件比对，无差异才报"已最新"。
 
 ### 2. 逐文件对账
-- 权威模板固定为 `skills/init-sdd-project/templates/`（Claude Code 下 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/`；Codex / opencode 下从技能根定位同一路径），不得从其他副本反向同步。模板 `claude-rules/README.md` 对应项目 `.claude/rules/README.md`，其他文件按共用参考 `skills/init-sdd-project/references/governance-install.md` §2 的安装映射定位，但**只对账上文「能干净同步」范围与 `AGENTS.md` 入口段**；`LICENSE`、`VERSION`、`.gitignore`、`.editorconfig`、`.github/` 与 `docs/_skeletons/*` 生成的项目文档属于一次性脚手架安装项，不列为同步候选（含 `AGENTS.md` 入口段：项目缺失时作为上游新增文件处理，已存在时只补入口段）。
+- 权威模板固定为 `skills/init-sdd-project/templates/`（Claude Code 下 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/`；Devin / Codex / opencode 下从技能根定位同一路径），不得从其他副本反向同步。模板 `claude-rules/README.md` 对应项目 `.claude/rules/README.md`，其他文件按共用参考 `skills/init-sdd-project/references/governance-install.md` §2 的安装映射定位，但**只对账上文「能干净同步」范围与 `AGENTS.md` 入口段**；`LICENSE`、`VERSION`、`.gitignore`、`.editorconfig`、`.github/` 与 `docs/_skeletons/*` 生成的项目文档属于一次性脚手架安装项，不列为同步候选（含 `AGENTS.md` 入口段：项目缺失时作为上游新增文件处理，已存在时只补入口段）。
 - **先做布局迁移**：旧版 init / retrofit 把 `ARCHITECTURE.md`、`CONTRIBUTING.md` 放在 `docs/`，现在落仓库根。项目里只有 `docs/` 下那份时，把它视为同一文件（不是“上游新增 + 项目删除”），经用户确认后 `git mv` 到仓库根，按共用参考 §3 双向修正相对链接（被移动文档内的链接与其他文档指向它的入口链接），再按新路径对账；根目录与 `docs/` 都有时列入冲突清单问用户，不自动合并或删除。
 - 对每个映射先区分四种状态：已有文件的章节增量、上游新增文件、上游删除文件、冲突；不得把“文件不同”直接等同于“整文件替换”。
 - **三方合并优先**：插件是 git 检出且含戳记 commit 时，用 `git -C <插件根> show <戳记commit>:<模板路径>` 取 base，精确分清“上游改的”与“项目改的”。

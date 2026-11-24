@@ -8,10 +8,10 @@
 
 - **Claude Code**：`commands/` 提供 `/sdd` 路由、`/sdd-status` 以及所有 workflow 快捷入口；`hooks/` 提供提交门、ADR 不可变提醒、文档同步提醒；`.mcp.json` 暴露 `sdd_check_drift`。
 - **OpenAI Codex**：`.codex-plugin/plugin.json`、`agents/openai.yaml`、`assets/` 和 `skills/*/agents/openai.yaml` 提供插件页、图标、能力说明、workflow skill cards 与默认 prompt；`.mcp.json` 暴露 `sdd_check_drift`。
-- **Devin**：`.devin-plugin/plugin.json` 为清单，加载全部技能（含 `sdd` 入口与 `sdd-status`，替代 Devin 不加载的斜杠命令）、根目录 `hooks.json`（护栏 hook，匹配 Devin 的 `exec` / `edit` / `write` 工具名）与 `.mcp.json` 的 `sdd_check_drift`。
+- **Devin**：`.devin-plugin/plugin.json` 为清单，加载全部技能（含 `sdd` 入口与 `sdd-status`，替代 Devin 不加载的斜杠命令）、根目录 `hooks.json`（护栏 hook，匹配 Devin 的 `exec` / `edit` / `write` / `apply_patch` 工具名，按 `DEVIN_PLUGIN_ROOT` 定位插件；Devin 按 Claude 兼容顺带读到的 `hooks/hooks.json` 会被启动器自动跳过，护栏不会跑两遍）与 `.mcp.json` 的 `sdd_check_drift`。
 - **opencode**：使用通用 `skills/`，不加载 Claude/Codex 插件专属增强。
 
-护栏 hook 一律经 `hooks/run-hook.sh` 启动：hook 进程拿不到交互 shell 的 PATH 时（如 Devin 云端），它按常见安装位置查找 `node`，找不到 `node` 或插件根时静默放行，不会以 exit 127 报错。
+护栏 hook 一律经 `hooks/run-hook.sh` 启动：hook 进程拿不到交互 shell 的 PATH 时（如 Devin 云端），它按常见安装位置查找 `node`，找不到 `node` 或插件根时静默放行，不会以 exit 127 报错。护栏统一用 stdout JSON 回给宿主（Devin 与 Claude Code 通用）：提交门以 `decision: block` 拦下不合规提交；ADR 提醒经 `additionalContext` 注入代理上下文；文档同步提醒在回合结束时拦一次、让代理补查文档，再次结束即放行。SDD 项目根从命令的 `workdir` / 开头的 `cd` / 被改文件的路径逐级向上找，不依赖会话的启动目录。
 
 ## 脚手架技能（一次性套上 SDD）
 
@@ -107,7 +107,7 @@ cp -r sdd-skills/skills/* ~/.codex/skills/          # 全局：所有项目可�
 
 ### Devin
 
-在 Devin 的插件设置里从 GitHub 安装 `wcpe/sdd-skills`（个人或组织范围均可），或在 Devin CLI 里 `devin plugins install wcpe/sdd-skills`。技能以 `/sdd-skills:<技能名>` 暴露；hook 与 MCP 随插件生效，改动对新会话生效。
+在 Devin 的插件设置里从 GitHub 安装 `wcpe/sdd-skills`（个人或组织范围均可），或在 Devin CLI 里 `devin plugins install wcpe/sdd-skills`。技能以 `/sdd-skills:<技能名>` 暴露（如 `/sdd-skills:sdd 加个导出功能`、`/sdd-skills:sdd-status`；Claude 的 `commands/` 斜杠命令在 Devin 下不加载，用这两个技能代替）；hook 与 MCP 随插件生效，改动对新会话生效。更新插件时从 `https://github.com/wcpe/sdd-skills/tree/master` 重装，只填仓库地址可能仍停在旧提交。
 
 ### opencode
 
