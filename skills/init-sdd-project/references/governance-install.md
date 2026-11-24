@@ -30,7 +30,7 @@
 
 一律**合并不覆盖**，先读再写：
 
-- `.gitignore`、`.editorconfig`：保留既有条目，只追加缺失项（至少 `/.tmp/`）。
+- `.gitignore`、`.editorconfig`：保留既有条目，只追加缺失项（至少 `/.tmp/`）。`.gitignore` 里已有 `!` 例外时，新增条目插在会被它覆盖的例外**之前**（后出现的规则优先），追加后用 `git check-ignore -v <例外路径>` 确认例外仍生效。
 - `README.md`、`CHANGELOG.md`、`docs/CONTRIBUTING.md`、`SECURITY.md`：保留既有正文，按模板章节补缺失段；既有约定（分支模型、发布方式）与模板冲突时沿用既有约定改写模板段。
 - `.github/` 下已有 PR / Issue 模板：保留既有，模板中缺失的检查项以追加方式补入。
 - `.claude/rules/` 已有同名规则：保留项目内容，模板增量按章节并入；无法判断归属的列入冲突清单问用户。
