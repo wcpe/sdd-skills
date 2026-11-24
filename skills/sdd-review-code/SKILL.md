@@ -26,7 +26,7 @@ description: SDD 项目专用(需 docs/PRD.md 与 .claude/rules/)。对代码库
 - **`module`** —— 指定路径 / 包。
 
 ### 2. 先读项目的权威标准
-- 读 `.claude/rules/*`(尤其 `architecture-invariants`:本项目的分层 / 禁用件 / 红线)、`docs/ARCHITECTURE.md`、`docs/adr/*`。
+- 读 `.claude/rules/*`(尤其 `architecture-invariants`:本项目的分层 / 禁用件 / 红线)、`ARCHITECTURE.md`、`docs/adr/*`。
 - 这些是"这个项目认什么"的真源——review **以它们为第一基准**,避免拿外部教条硬套到一个有意做了别的取舍的项目上。
 
 ### 3. 按维度逐项审（每条要证据）

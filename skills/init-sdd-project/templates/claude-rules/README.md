@@ -15,4 +15,4 @@
 | [config-files.md](config-files.md) | YAML 配置规范 |
 | [git-commit.md](git-commit.md) | **提交信息规范**、**逻辑提交粒度**、**主线历史整理**、**文档入库边界**与**禁止擅自开 PR / 破坏性操作** |
 
-> 完整演进与维护流程见 [../../docs/CONTRIBUTING.md](../../docs/CONTRIBUTING.md)。
+> 完整演进与维护流程见 [../../CONTRIBUTING.md](../../CONTRIBUTING.md)。

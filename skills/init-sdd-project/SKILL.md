@@ -28,7 +28,7 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 
 ### 2. 生成项目特定文档（据 `templates/docs/_skeletons/` + 访谈填实）
 - `docs/PRD.md`：目标/非目标/角色/用户故事/FR 表（带 `状态` 列：计划/开发中/已交付@版本）/NFR/验收/术语。
-- `docs/ARCHITECTURE.md`：定位/模块/数据模型/接口/机制/部署/关键裁决/边界。
+- `ARCHITECTURE.md`：定位/模块/数据模型/接口/机制/部署/关键裁决/边界（放仓库根，与 README 同级）。
 - `docs/API.md`：按项目接口形态填契约。
 - `docs/adr/0001…`：把访谈里定下的**重大决策**各写一条 ADR（技术栈选型、核心架构取舍…），用 `templates/docs/_skeletons/ADR.md`；从 0001 顺序编号。
 - `.claude/rules/architecture-invariants.md`：据本项目锁定的边界/禁用件/红线**填实** `templates/claude-rules/architecture-invariants.md` 的占位（这条是项目专属，不能照搬别人的）。
@@ -37,7 +37,7 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 ### 3. 原样安装通用治理（从 `templates/` 拷贝，仅替换占位符）
 - `templates/claude-rules/*` → `<project>/.claude/rules/`（comments / config-files / git-commit / doc-sync / decision-alignment / scope-discipline / testing-and-quality / test-conventions / static-analysis / README）。
 - 迭代技能**不拷进项目**：`sdd-brainstorming` / `sdd-develop-feature` / `sdd-fix-bug` / `sdd-refactor-code` / `sdd-rollback-change` / `sdd-hotfix` / `sdd-release-version` / `sdd-publish-snapshot` / `sdd-bump-dependencies` / `sdd-update-docs` / `sdd-reconcile-external-commits` / `sdd-accept-phase` / `sdd-realign-prd` / `sdd-parallel-develop` / `sdd-review-code` / `sdd-sync-governance` 随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装；项目侧不放 `.claude/skills/`。
-- `templates/docs/{CONTRIBUTING.md, adr/README.md, specs/README.md, specs/_template.md}` → `<project>/docs/`。
+- `templates/CONTRIBUTING.md` → `<project>/CONTRIBUTING.md`（仓库根，与 README 同级）；`templates/docs/{adr/README.md, specs/README.md, specs/_template.md}` → `<project>/docs/`。
 - `templates/github/*` → `<project>/.github/`；`templates/editorconfig.txt` → `.editorconfig`；按栈选 `templates/gitignore-templates/<stack>.gitignore` → `.gitignore`。
 - 写 `.claude/rules/.sdd-version` 记来源戳：当前 sdd-skills 版本（读 `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` 的 `version`，是 git 检出再附 `commit`）+ 日期 + 来源技能，供 `sdd-sync-governance` 日后增量升级治理用。
 仅替换占位符：项目名、技术栈、提交 scope 例子、测试高风险区、P2/P3 能力、静态检查工具等。
@@ -55,7 +55,7 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 
 ## 实战提示（固化测试反馈）
 
-- **`_skeletons/` 只是生成蓝本，不整目录拷进项目**。据它生成 `PRD / ARCHITECTURE / API / OPERATIONS / SECURITY / README / CHANGELOG`（都在 `_skeletons/` 有对应骨架）+ ADR；**额外**把 `_skeletons/ADR.md` 拷成 `docs/adr/_template.md`，供项目以后写新 ADR。
+- **`_skeletons/` 只是生成蓝本，不整目录拷进项目**。据它生成 `PRD / ARCHITECTURE / API / OPERATIONS / SECURITY / README / CHANGELOG`（都在 `_skeletons/` 有对应骨架）+ ADR；其中 `ARCHITECTURE.md` 落**仓库根**（与 `README.md` 同级），其余落 `docs/`。**额外**把 `_skeletons/ADR.md` 拷成 `docs/adr/_template.md`，供项目以后写新 ADR。
 - **占位符要扫干净**：`<...>` 散落在 `architecture-invariants` / `scope-discipline` / `testing-and-quality` / `git-commit`（scope 例子）/ `LICENSE`（年份·持有者）/ **`CONTRIBUTING`（`<各可交付物>` / `<各组件测试全绿>`，易漏）**。装完跑一遍 `grep -rn '<[^>]*>'` 自查（迭代技能已全局化、不在项目内，不必扫）。
 - **填完 `architecture-invariants` 删掉模板自带的填写引导**（那是给你填的脚手，不该留在项目里）。
 - **右尺寸的可操作判据**：无 YAML 配置 → 可不装 `config-files.md`；单人 / 暂不用 CI → 把 `CONTRIBUTING §8` 与 `static-analysis` 的 CI 段改成"可选 / 如果用 CI"而非既定事实；无独立构建产物的解释型项目（Python 等）→ 在 `docs/OPERATIONS.md` / README 的构建章节写明"源码即交付物 + 测试"（全局 `sdd-release-version` / `sdd-publish-snapshot` 会从这里读构建 / 测试命令）。

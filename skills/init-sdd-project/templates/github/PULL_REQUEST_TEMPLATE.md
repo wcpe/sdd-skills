@@ -8,7 +8,7 @@
 - [ ] revert 回滚
 - [ ] docs / chore / 其他
 
-## 防漂移自检（见 docs/CONTRIBUTING.md 与 .claude/rules/）
+## 防漂移自检（见 CONTRIBUTING.md 与 .claude/rules/）
 - [ ] 方向一致：已读相关 PRD / ARCHITECTURE / ADR，未静默违背既定决策
 - [ ] 范围合规：未夹带 P2/P3 能力或镀金（scope-discipline）
 - [ ] 测试：新增 / 改的行为有测试，相关测试全绿（验证门通过）

@@ -7,7 +7,7 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。当 sd
 
 ## 为什么需要它
 
-`sdd-*` 迭代技能随插件走、`/plugin update` 一次全项目生效；但 `.claude/rules/*`、`docs/CONTRIBUTING.md`、`docs/specs/_template.md` 等是 **init/retrofit 时拷进项目的副本**，之后与上游脱钩——插件更新够不到它们。本技能把上游治理模板的改动**对账式**并回项目，补上这个缺口。
+`sdd-*` 迭代技能随插件走、`/plugin update` 一次全项目生效；但 `.claude/rules/*`、`CONTRIBUTING.md`、`docs/specs/_template.md` 等是 **init/retrofit 时拷进项目的副本**，之后与上游脱钩——插件更新够不到它们。本技能把上游治理模板的改动**对账式**并回项目，补上这个缺口。
 
 ## 核心原则
 
@@ -15,7 +15,7 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。当 sd
 
 ## 适用边界
 
-- **能干净同步**（通用正文，随上游走）：`.claude/rules/README.md` 与 `.claude/rules/` 里除 `architecture-invariants.md` 外的规则（`testing-and-quality` 除 §2 高风险区），包括 `git-commit` / `doc-sync` / `decision-alignment` / `scope-discipline` / `comments` / `config-files` / `test-conventions` / `static-analysis`，以及 `docs/CONTRIBUTING.md`、`docs/specs/_template.md`、`docs/adr/_template.md`。
+- **能干净同步**（通用正文，随上游走）：`.claude/rules/README.md` 与 `.claude/rules/` 里除 `architecture-invariants.md` 外的规则（`testing-and-quality` 除 §2 高风险区），包括 `git-commit` / `doc-sync` / `decision-alignment` / `scope-discipline` / `comments` / `config-files` / `test-conventions` / `static-analysis`，以及 `CONTRIBUTING.md`（项目根）、`docs/specs/_template.md`、`docs/adr/_template.md`。
 - **绝不覆盖**（项目自有）：`architecture-invariants.md`、`testing-and-quality §2 高风险区`、一切 `<...>` 占位的填充处。
 - **只提建议、不自动写**（活在项目自有文档里的治理注记）：如 PRD §4 / §6、ARCHITECTURE 里的约定——这些嵌在项目已填的文档中，本技能只**列出"上游加了这条，建议你也加"**，由用户走 `sdd-update-docs` 自行决定。
 
@@ -33,7 +33,7 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。当 sd
 
 ### 3. 应用章节级增量（保留项目定制）
 - 只把 upstream 新增或改写的**通用治理章节、条款、索引行**按标题、相邻标题、表头或既有条款等稳定锚点并入对应位置；占位、项目填充、`architecture-invariants`、`testing-and-quality §2` 一字不动，绝不整文件覆盖。
-- 旧项目若缺少 `git-commit.md` 的完整标题锚点 `## 4. 提交历史整理与合并策略（强制）`、`docs/CONTRIBUTING.md` 的完整标题锚点 `### 8.1 提交历史治理（摘要）`，或 `.claude/rules/README.md` 中包含“提交信息规范、逻辑提交粒度、主线历史整理、文档入库边界”的 `git-commit.md` 索引行，将其视为 upstream 新增的通用章节或索引行，展示插入锚点与拟新增正文后再做增量插入；不得借此重排或改写相邻项目内容。
+- 旧项目若缺少 `git-commit.md` 的完整标题锚点 `## 4. 提交历史整理与合并策略（强制）`、`CONTRIBUTING.md` 的完整标题锚点 `### 8.1 提交历史治理（摘要）`，或 `.claude/rules/README.md` 中包含“提交信息规范、逻辑提交粒度、主线历史整理、文档入库边界”的 `git-commit.md` 索引行，将其视为 upstream 新增的通用章节或索引行，展示插入锚点与拟新增正文后再做增量插入；不得借此重排或改写相邻项目内容。
 - 若同名章节、同一条款或对应索引已经存在但内容不同，判定为**冲突**：列出 `base`、`project`、`upstream` 三方差异；取不到 base 时明确标为缺失并列出 project / upstream 两方差异，然后停下询问用户，禁止静默覆盖。
 - upstream 新增文件只列为候选，说明目标路径与用途，获得用户确认后才创建；upstream 删除文件只报告删除事实和项目当前状态，不自动删除项目文件。
 - 其他拿不准归属或锚点的差异同样按冲突处理，停下来问，不臆测覆盖。

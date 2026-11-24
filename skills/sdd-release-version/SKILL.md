@@ -34,7 +34,7 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。发布
 
 ### 5. 版本号与文档同步
 - 更新版本来源（**唯一版本来源**，构建注入各可交付物，见 ADR / 版本来源约定）。
-- 同步 README / docs 中过时的版本引用；结构变化更新 `docs/ARCHITECTURE.md`。
+- 同步 README / docs 中过时的版本引用；结构变化更新 `ARCHITECTURE.md`。
 - 把本版本交付的 PRD 功能需求（FR）状态改为 `已交付@vX.Y.Z`。
 - 注：发快照 / 开发版走 `sdd-publish-snapshot` 技能；本技能只出正式 tag 版本。
 

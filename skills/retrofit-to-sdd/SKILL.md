@@ -19,7 +19,7 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 - 产出一份"现状速览"作为后续文档的事实基础（放 `.tmp/`，不入库）。
 
 ### 2. 反向提取项目级规格（忠于现状，这是逆向最大价值）
-- **`docs/ARCHITECTURE.md`**：把代码里**隐含的架构显式化**——现有模块/数据模型/机制/依赖流向**照实写**。
+- **`ARCHITECTURE.md`（仓库根）**：把代码里**隐含的架构显式化**——现有模块/数据模型/机制/依赖流向**照实写**。
 - **`docs/PRD.md`**：从现有功能反推需求，FR 表里**已实现的标 `已交付`**、规划中的标 `计划`；别把已做的写成 TODO。
 - **`docs/API.md`**：照现有对外接口写契约。
 - **`docs/adr/`**：把代码里**已经成立的重大决策**补记为 ADR（选了什么框架/为何这样分层/关键取舍），状态写 `已接受`、背景注明"现状追认"。**只追认重大的**，别给每个细节写 ADR（会滥用）。
@@ -28,7 +28,7 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 ### 3. 安装通用治理（从权威模板拷贝，按本项目替换占位符）
 同 `init-sdd-project` 第 3 步，所有来源都指向 `skills/init-sdd-project/templates/`：
 - 权威模板的 `claude-rules/*` → `.claude/rules/`。迭代技能**不拷入项目**——`sdd-*` 技能随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装。
-- 权威模板的 `docs/{CONTRIBUTING, adr/README, specs/*}` → `docs/`；`github/*`、`editorconfig.txt`、按栈选 `.gitignore`。
+- 权威模板的 `CONTRIBUTING.md` → 仓库根；`docs/{adr/README, specs/*}` → `docs/`；`github/*`、`editorconfig.txt`、按栈选 `.gitignore`。
 - 补 `CHANGELOG.md` / `VERSION` / `SECURITY.md` / `docs/OPERATIONS.md` 骨架（据现状填）。
 - **`.gitignore` 已含 `/.tmp/` 等**——若项目已有 `.gitignore`，是合并不是覆盖。
 - 写 `.claude/rules/.sdd-version` 记来源戳（当前 sdd-skills 版本，读 `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` 的 `version`，是 git 检出再附 `commit`）+ 日期 + 来源技能，供 `sdd-sync-governance` 日后增量升级治理用。
@@ -47,7 +47,7 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 
 ## 实战提示（固化测试反馈）
 
-- **`_skeletons/` 只是生成蓝本，不整目录拷入**；据它生成各文档 + 把 `_skeletons/ADR.md` 拷成 `docs/adr/_template.md` 供以后用。
+- **`_skeletons/` 只是生成蓝本，不整目录拷入**；据它生成各文档（`ARCHITECTURE.md` 落仓库根，其余落 `docs/`）+ 把 `_skeletons/ADR.md` 拷成 `docs/adr/_template.md` 供以后用。
 - **占位符扫干净**：装完 `grep -rn '<[^>]*>'` 自查（`CONTRIBUTING` 的 `<各可交付物>` / `<各组件测试全绿>`、`architecture-invariants` / `git-commit` / `LICENSE` 等都有；迭代技能已全局化、不在项目内，不必扫）；填完 `architecture-invariants` 删掉模板自带的填写引导。
 - **逆向项目通常没发过版**：追认的已交付 FR 状态填 `已交付`（**不带版本号**），首次发版时由 `sdd-release-version` 回填 `@vX.Y.Z`。
 - **CHANGELOG 不追溯逆向前的历史能力**：只记一条"引入 SDD 治理"并指向 PRD FR 表（现有能力已用 FR 的 `已交付` 标明），别为旧功能逐条补 changelog。

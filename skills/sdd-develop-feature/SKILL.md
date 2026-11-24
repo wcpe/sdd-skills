@@ -7,12 +7,12 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。开发
 
 ## 核心原则
 
-新功能要落在既定方向上，而不是另起炉灶：先对齐需求与架构、确认它在当前阶段范围内、用可验证的目标驱动实现，最后让文档与代码保持一致。完整流程见 `docs/CONTRIBUTING.md`，红线见 `.claude/rules/`。
+新功能要落在既定方向上，而不是另起炉灶：先对齐需求与架构、确认它在当前阶段范围内、用可验证的目标驱动实现，最后让文档与代码保持一致。完整流程见 `CONTRIBUTING.md`，红线见 `.claude/rules/`。
 
 ## 强制流程
 
 ### 1. 对齐与范围（动手前）
-- 读 `docs/PRD.md`、`docs/ARCHITECTURE.md` 及相关 `docs/adr/*`，理解既定方向（见 `decision-alignment`）。
+- 读 `docs/PRD.md`、`ARCHITECTURE.md` 及相关 `docs/adr/*`，理解既定方向（见 `decision-alignment`）。
 - 判断该功能属于哪个阶段：若它是后续阶段才计划的能力，**停下来和用户确认是否现在做**（见 `scope-discipline`），不擅自越界、不为它埋占位字段。
 - 需求或边界不清 → 先问，不臆测。
 - **spec 判定**（如果从 `sdd-brainstorming` 路由来已带判定结果，直接遵循，不重新判定；否则**必须过以下 checklist 客观判定，不靠感觉判断"简不简单"**）：
@@ -36,7 +36,7 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。开发
 
 ### 3. 架构与契约（怎么建）
 - 涉及架构决策（引入新技术 / 新模式 / 推翻旧决策）→ 写一条新 `docs/adr/NNNN-*.md`（必要时取代旧 ADR，旧的标记"已被取代"，不删）。
-- 更新 `docs/ARCHITECTURE.md`（新模块 / 数据模型 / 机制 / 依赖）；接口变更同步 `docs/API.md`。
+- 更新 `ARCHITECTURE.md`（新模块 / 数据模型 / 机制 / 依赖）；接口变更同步 `docs/API.md`。
 
 ### 4. 目标驱动：测试先行
 - 把"加功能"转成可验证目标：**先为新行为写测试**（此时应失败），再写实现让它通过。这样"做完"有客观标准。

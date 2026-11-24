@@ -76,7 +76,6 @@ const contributing = readRepo(
   'skills',
   'init-sdd-project',
   'templates',
-  'docs',
   'CONTRIBUTING.md',
 );
 
@@ -196,7 +195,7 @@ test('CONTRIBUTING 摘要提交历史治理并链接权威规则', () => {
     contributing.split(/\r?\n/).includes(contributingHeading),
     'CONTRIBUTING 必须使用逐字一致的提交历史治理标题',
   );
-  assert.match(contributing, /\.\.\/\.claude\/rules\/git-commit\.md/);
+  assert.match(contributing, /\]\(\.claude\/rules\/git-commit\.md\)/);
   assertParagraphWithTerms(
     contributing,
     [/提交历史/, /(?:频繁提交|逻辑提交|主线整理)/],

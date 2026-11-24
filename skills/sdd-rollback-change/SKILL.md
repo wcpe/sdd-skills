@@ -24,7 +24,7 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。回滚
 
 ### 4. 决策与文档回正
 - 被回滚的功能若有支撑它的 **ADR → 写一条新 ADR 取代它**（旧 ADR 状态改"已被 ADR-NNNN 取代"，**不删**），记录"为什么回"。
-- 更新 `docs/PRD.md`（需求移除 / 推迟）、`docs/ARCHITECTURE.md`、`docs/API.md`（`doc-sync`）。
+- 更新 `docs/PRD.md`（需求移除 / 推迟）、`ARCHITECTURE.md`、`docs/API.md`（`doc-sync`）。
 
 ### 5. 验证
 - 回滚后测试全绿；被移除的行为确已消失；其余功能无损（无半截不一致状态）。
