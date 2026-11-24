@@ -75,6 +75,13 @@ test('提交门：Devin exec 的 workdir 指向 SDD 项目时拦截不合规标�
       { tool_name: 'exec', tool_input: { command: 'git commit -m "update stuff"', workdir: tmpdir() } },
       { host: 'devin' });
     assert.equal(plain.status, 0, '非 SDD 项目不碰');
+    const sub = path.join(dir, 'vendor', 'lib');
+    mkdirSync(sub, { recursive: true });
+    writeFileSync(path.join(sub, '.git'), 'gitdir: ../../.git/modules/lib\n');
+    const submodule = runHook('guard-commit.js',
+      { tool_name: 'exec', tool_input: { command: 'git commit -m "update stuff"', workdir: sub } },
+      { host: 'devin' });
+    assert.equal(submodule.status, 0, '非 SDD 的子模块不套用外层规则');
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
@@ -95,6 +102,10 @@ test('ADR 门：改已接受 ADR（含 apply_patch 绝对路径）时经 additio
     const supersede = runHook('guard-adr.js',
       { tool_name: 'edit', tool_input: { file_path: adr, new_string: '已被 ADR-0002 取代' } }, { host: 'devin' });
     assert.equal(supersede.stdout, '', '合法的取代标记不提醒');
+    const removedOnly = runHook('guard-adr.js',
+      { tool_name: 'apply_patch', tool_input: { patch: `*** Begin Patch\n*** Update File: ${adr}\n@@\n-旧方案已弃用\n+改决策\n*** End Patch` } },
+      { host: 'devin' });
+    assert.match(removedOnly.stdout, /additionalContext/, '删除行里的旧措辞不能跳过提醒');
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 

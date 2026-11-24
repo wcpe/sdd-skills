@@ -18,7 +18,9 @@ readStdin(function (input) {
   const adrs = files.filter(function (f) { return ADR_RE.test(f) })
   if (!adrs.length) process.exit(0)
 
-  const edit = [ti.new_string, ti.content, patch].filter(Boolean).join('\n') +
+  // 补丁只看新增行：删除行里的「已弃用」等旧措辞不代表本次是状态变更
+  const added = patch.split(/\r?\n/).filter(function (l) { return /^\+(?!\+\+)/.test(l) }).join('\n')
+  const edit = [ti.new_string, ti.content, added].filter(Boolean).join('\n') +
     (Array.isArray(ti.edits) ? '\n' + ti.edits.map(function (e) { return e && e.new_string }).filter(Boolean).join('\n') : '')
   // 本次编辑若是合法的「取代标记」更新，不提醒
   if (/已被\s*ADR-\d{4}.*取代|已弃用/.test(edit)) process.exit(0)
