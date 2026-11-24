@@ -36,6 +36,7 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。验收
 - **测试证据**：覆盖该 FR 的单元 / 集成 / E2E 测试存在且**全绿**（判据见 `testing-and-quality`）。
 - **真机证据**：涉及实机 / 集成 / 真实环境的（如"杀进程仍可用""热更秒级生效"），**真机跑过**——`测试绿 ≠ 真能用`，别让自动化掩盖真实失败。
 - 区分"代码没实现""实现了但不符验收""只是没测 / 没验"——它们后续路由不同。
+- **隐私门**（可选依赖 privacy-guard，探测与命令见 `../init-sdd-project/references/privacy-guard.md`）：changes 扫 `base..HEAD` 新增，phase / version 扫上个发布 tag 以来新增。有 critical → 本次验收**不通过**（路由 `sdd-fix-bug`：移除硬编码、改读配置，并提醒轮换；移除并轮换后复验的处理见共用参考 §2）；major 列入差距清单由用户定夺。没装 privacy-guard → 报告写「隐私扫描：未安装，已跳过」并附安装提示，不影响其他判定。
 
 ### 3. 产出验收报告
 - 写一份逐项的**通过 / 差距清单**到 `.tmp/`（**不入库**），文件名按 scope 区分、便于对照历史：

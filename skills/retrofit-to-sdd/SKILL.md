@@ -22,6 +22,7 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 - 摸清：技术栈、目录结构、模块与依赖流向、对外接口、数据模型、部署方式、测试现状、已有文档/约定（含已有 `AGENTS.md` / `CLAUDE.md` / `CONTRIBUTING` / 分支模型 / 提交规范）。
 - 大项目可**并行多个子代理**分头读：按顶层模块或部署单元切分（每个子代理一个模块，跨模块的公共层单独一份），每份产出同一结构的速览（模块职责 / 对外接口 / 数据模型 / 依赖 / 证据路径），再由主代理汇总去重。
 - 产出一份"现状速览"作为后续文档的事实基础（放 `.tmp/`，不入库）。
+- **隐私体检**（可选依赖 privacy-guard，按 `../init-sdd-project/references/privacy-guard.md` 探测；没装就提示安装并跳过）：老仓库跑一次全量（工作区 + 全历史）扫描。命中的真凭证列进 `.tmp/` 待办，**先提醒用户吊销 / 轮换**；用户确认后记基线，之后验收与发版只拦新增。不改写历史、不 force-push。
 
 ### 2. 反向提取项目级规格（忠于现状，这是逆向最大价值）
 - **每条事实带证据**：已交付 FR、ADR 追认、不变量都要能指回代码——在 `.tmp/` 现状速览里记下对应的文件路径 / 模块 / 入口；找不到证据的不写成已交付，列入缺口清单问用户。
@@ -32,7 +33,7 @@ description: 把一个已存在的代码库逆向改造成 SDD（规格驱动开
 - **`.claude/rules/architecture-invariants.md`**：把现有代码**事实上的边界与禁忌**固化为不变量（据现状，不是空想）。
 
 ### 3. 安装通用治理（从权威模板拷贝，按本项目替换占位符）
-- 按共用参考 §2 安装映射落地：权威模板的 `claude-rules/*`、`AGENTS.md`、仓库根的 `CONTRIBUTING.md`、`docs/` 下的 adr / specs、`github/*`、`editorconfig.txt`、按栈选 `.gitignore`。迭代技能**不拷入项目**——`sdd-*` 技能随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装。
+- 按共用参考 §2 安装映射落地：权威模板的 `claude-rules/*`、`AGENTS.md`、仓库根的 `CONTRIBUTING.md`、`docs/` 下的 adr / specs、`github/*`、`editorconfig.txt`、按栈选 `.gitignore`、`privacy-guard.json`。迭代技能**不拷入项目**——`sdd-*` 技能随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装。
 - 补 `CHANGELOG.md` / `VERSION` / `SECURITY.md` / `docs/OPERATIONS.md` 骨架（据现状填）。
 - **老仓库几乎每个目标路径都可能已存在**：一律按共用参考 §3 合并不覆盖（`.gitignore`、README、CONTRIBUTING、`.github` 模板、`.editorconfig`、`.claude/rules`、`AGENTS.md` / `CLAUDE.md`、`LICENSE`）。
 - 按共用参考 §1 写 `.claude/rules/.sdd-version` 来源戳。

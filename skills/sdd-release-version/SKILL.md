@@ -20,6 +20,7 @@ description: SDD 项目专用(需存在 docs/PRD.md 与 .claude/rules/)。发布
 
 ### 2. 阻断验证（改版本号前，确认基线本就可发布）
 - 构建**全部可交付物**并跑通**全部测试**（命令见 `docs/OPERATIONS.md` / README，或项目约定）。
+- **隐私扫描**（可选依赖 privacy-guard，见 `../init-sdd-project/references/privacy-guard.md`）：扫上个发布 tag 以来新增的内容，`--fail-on critical`。有 critical 视同验证失败；没装 privacy-guard 就提示安装并跳过这一项，不阻断发版。
 - 任一失败 → 立即停止、报告失败命令与关键错误、询问是否修复；不得改版本、提交或打 tag。
 
 ### 3. 按 commit 自动判断 SemVer

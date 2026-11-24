@@ -40,7 +40,7 @@ description: 从零初始化一个 SDD（规格驱动开发）项目脚手架时
 - `README.md` / `CHANGELOG.md` / `docs/OPERATIONS.md` / `SECURITY.md` / `VERSION` / `LICENSE`：据访谈填实（许可按用户选择，从 `templates/licenses/` 取）。
 
 ### 3. 原样安装通用治理（从 `templates/` 拷贝，仅替换占位符）
-- 按共用参考 §2 安装映射逐项落地：`.claude/rules/*`、`AGENTS.md`、仓库根的 `CONTRIBUTING.md`、`docs/` 下的 adr / specs、`.github/`、`.editorconfig`、按栈选的 `.gitignore`。
+- 按共用参考 §2 安装映射逐项落地：`.claude/rules/*`、`AGENTS.md`、仓库根的 `CONTRIBUTING.md`、`docs/` 下的 adr / specs、`.github/`、`.editorconfig`、按栈选的 `.gitignore`、`.privacy-guard.json`（隐私扫描配置，可选依赖，见 `references/privacy-guard.md`）。
 - 迭代技能**不拷进项目**：16 个 `sdd-*` 技能随本 `sdd-skills` 插件一同提供、所有 SDD 项目共享，无需单独安装；项目侧不放 `.claude/skills/`。
 - 按共用参考 §1 写 `.claude/rules/.sdd-version` 来源戳。
 仅替换占位符：项目名、技术栈、提交 scope 例子、测试高风险区、P2/P3 能力、静态检查工具等。
