@@ -2,8 +2,7 @@
   "mcpServers": {
     "sdd": {
       "command": "node",
-      "args": ["scripts/sdd-mcp-launcher.mjs"],
-      "cwd": "."
+      "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/sdd-mcp-launcher.mjs"]
     }
   }
 }

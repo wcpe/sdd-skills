@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "sdd": {
+      "command": "node",
+      "args": ["./scripts/sdd-mcp-launcher.mjs"],
+      "cwd": "."
+    }
+  }
+}

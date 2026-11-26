@@ -8,7 +8,7 @@
   "homepage": "https://github.com/wcpe/sdd-skills",
   "repository": "https://github.com/wcpe/sdd-skills",
   "skills": "./skills/",
-  "mcpServers": "./.mcp.json",
+  "mcpServers": "./.codex-plugin/mcp.json",
   "interface": {
     "displayName": "SDD Skills",
     "shortDescription": "规格驱动开发技能集，覆盖项目初始化、迭代、修复、发布与治理同步。",
