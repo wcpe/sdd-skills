@@ -33,4 +33,10 @@ function readStdin (cb) {
 
 function emit (obj) { process.stdout.write(JSON.stringify(obj) + '\n') }
 
-module.exports = { findSddRoot, readStdin, emit }
+function emitAndExit (obj, code) {
+  process.stdout.write(JSON.stringify(obj) + '\n', function () {
+    process.exit(typeof code === 'number' ? code : 0)
+  })
+}
+
+module.exports = { findSddRoot, readStdin, emit, emitAndExit }

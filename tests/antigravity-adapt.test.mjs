@@ -41,8 +41,9 @@ test('Antigravity 插件清单与 MCP 配置合法、版本一致且 logo 文件
   assert.deepEqual(mcp.mcpServers.sdd.args, ['${PLUGIN_ROOT}/scripts/sdd-mcp-launcher.mjs']);
 });
 
-test('Antigravity 提交门：不合规标题返回 exit 0 + decision:deny，合规标题返回 {}', () => {
+test('Antigravity 提交门：不合规标题与跨仓链式提交均返回 exit 0 + decision:deny，合规标题返回 decision:allow', () => {
   const dir = makeSddProject();
+  const plain = mkdtempSync(path.join(tmpdir(), 'sdd-plain-'));
   try {
     const bad = runHook('guard-commit.js', {
       toolCall: { name: 'run_command', args: { CommandLine: 'git commit -m "update stuff"', Cwd: dir } },
@@ -51,18 +52,26 @@ test('Antigravity 提交门：不合规标题返回 exit 0 + decision:deny，合
     assert.equal(bad.status, 0, 'Antigravity 阻断必须返回 exit 0');
     assert.equal(JSON.parse(bad.stdout).decision, 'deny');
 
+    const chained = runHook('guard-commit.js', {
+      toolCall: { name: 'run_command', args: { CommandLine: `git commit -m "update stuff" && git -C "${plain}" commit -m "other"`, Cwd: dir } },
+      workspacePaths: [dir, plain],
+    });
+    assert.equal(chained.status, 0);
+    assert.equal(JSON.parse(chained.stdout).decision, 'deny', '先提交 SDD 仓再 git -C 普通仓不得漏检前者');
+
     const good = runHook('guard-commit.js', {
       toolCall: { name: 'run_command', args: { CommandLine: 'git commit -m "fix(core): 修复空指针"', Cwd: dir } },
       workspacePaths: [dir],
     });
     assert.equal(good.status, 0);
-    assert.deepEqual(JSON.parse(good.stdout), {});
+    assert.deepEqual(JSON.parse(good.stdout), { decision: 'allow' });
   } finally {
     rmSync(dir, { recursive: true, force: true });
+    rmSync(plain, { recursive: true, force: true });
   }
 });
 
-test('Antigravity ADR 门：改已接受 ADR 返回 exit 0 + decision:ask，合法取代标记返回 {}', () => {
+test('Antigravity ADR 门：改已接受 ADR 返回 exit 0 + decision:ask，合法取代标记返回 decision:allow', () => {
   const dir = makeSddProject();
   try {
     const adr = path.join(dir, 'docs', 'adr', '0001-use-x.md');
@@ -82,29 +91,34 @@ test('Antigravity ADR 门：改已接受 ADR 返回 exit 0 + decision:ask，合�
       workspacePaths: [dir],
     });
     assert.equal(ok.status, 0);
-    assert.deepEqual(JSON.parse(ok.stdout), {});
+    assert.deepEqual(JSON.parse(ok.stdout), { decision: 'allow' });
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 });
 
-test('Antigravity 文档同步门：首次 Stop 返回 decision:continue，第二次 executionNum=2 放行返回 {}', () => {
-  const dir = makeSddProject();
+test('Antigravity 文档同步门：覆盖多工作区后续 SDD 仓，首次返回 decision:continue，第二次 executionNum=2 返回 decision:allow', () => {
+  const cleanSdd = makeSddProject();
+  const dirtySdd = makeSddProject();
   try {
-    const git = (...a) => execFileSync('git', a, { cwd: dir, stdio: 'ignore' });
-    git('init', '-q');
-    mkdirSync(path.join(dir, 'src'));
-    writeFileSync(path.join(dir, 'src', 'a.ts'), 'export {}\n');
-    git('add', 'src/a.ts');
+    const git = (cwd, ...a) => execFileSync('git', a, { cwd, stdio: 'ignore' });
+    git(cleanSdd, 'init', '-q');
+    git(dirtySdd, 'init', '-q');
+    mkdirSync(path.join(dirtySdd, 'src'));
+    writeFileSync(path.join(dirtySdd, 'src', 'a.ts'), 'export {}\n');
+    git(dirtySdd, 'add', 'src/a.ts');
 
-    const first = runHook('nudge-doc-sync.js', { executionNum: 1, workspacePaths: [dir] });
+    const first = runHook('nudge-doc-sync.js', { executionNum: 1, workspacePaths: [cleanSdd, dirtySdd] });
     assert.equal(first.status, 0);
-    assert.equal(JSON.parse(first.stdout).decision, 'continue');
+    const firstOut = JSON.parse(first.stdout);
+    assert.equal(firstOut.decision, 'continue', '后续工作区的 SDD 仓缺文档也必须提醒');
+    assert.ok(firstOut.reason.includes(dirtySdd));
 
-    const second = runHook('nudge-doc-sync.js', { executionNum: 2, workspacePaths: [dir] });
+    const second = runHook('nudge-doc-sync.js', { executionNum: 2, workspacePaths: [cleanSdd, dirtySdd] });
     assert.equal(second.status, 0);
-    assert.deepEqual(JSON.parse(second.stdout), {});
+    assert.deepEqual(JSON.parse(second.stdout), { decision: 'allow' });
   } finally {
-    rmSync(dir, { recursive: true, force: true });
+    rmSync(cleanSdd, { recursive: true, force: true });
+    rmSync(dirtySdd, { recursive: true, force: true });
   }
 });
