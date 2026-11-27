@@ -6,15 +6,31 @@ const { execSync } = require('child_process')
 const { findSddRoot, readStdin, emit } = require('./sdd-hook-lib')
 
 readStdin(function (input) {
-  if (input.stop_hook_active) process.exit(0)
-  const root = findSddRoot(process.cwd())
-  if (!root) process.exit(0)
+  const isAntigravity = process.env.AGENT_HOOK_HOST === 'antigravity' || typeof input.executionNum === 'number' || Array.isArray(input.workspacePaths)
+  const allow = function () {
+    if (isAntigravity) emit({})
+    process.exit(0)
+  }
+
+  if (input.stop_hook_active) allow()
+  if (typeof input.executionNum === 'number' && input.executionNum > 1) allow()
+
+  const candidates = Array.isArray(input.workspacePaths) && input.workspacePaths.length
+    ? input.workspacePaths.concat([process.cwd()])
+    : [process.cwd()]
+  let root = null
+  for (let i = 0; i < candidates.length; i++) {
+    root = findSddRoot(candidates[i])
+    if (root) break
+  }
+  if (!root) allow()
+
   let staged = ''
   try {
     staged = execSync('git diff --cached --name-only', { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })
-  } catch (e) { process.exit(0) }
+  } catch (e) { allow() }
   const files = staged.split(/\r?\n/).filter(Boolean)
-  if (!files.length) process.exit(0)
+  if (!files.length) allow()
   const isDoc = function (f) {
     return /^docs\//.test(f) || /CHANGELOG/i.test(f) || /README/i.test(f) || /^(ARCHITECTURE|CONTRIBUTING)\.md$/i.test(f)
   }
@@ -24,8 +40,12 @@ readStdin(function (input) {
   if (files.some(isCode) && !files.some(isDoc)) {
     const msg = '[SDD 文档同步] 暂存区有代码改动、却没有文档改动。SDD「文档即代码」：受影响的 ' +
       'PRD / ARCHITECTURE / API / CHANGELOG 应在同一次变更里改到一致——确认无文档漂移（doc-sync）后再结束；确实无需改文档就说明理由并结束。'
+    if (isAntigravity) {
+      emit({ decision: 'continue', reason: msg })
+      process.exit(0)
+    }
     emit({ decision: 'block', reason: msg })
     console.error(msg)
   }
-  process.exit(0)
+  allow()
 })

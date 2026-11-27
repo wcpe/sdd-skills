@@ -7,16 +7,28 @@ const path = require('path')
 const { findSddRoot, readStdin, emit } = require('./sdd-hook-lib')
 
 readStdin(function (input) {
-  const ti = input.tool_input || {}
-  const cmd = String(ti.command || '')
-  if (!/\bgit\s+commit\b/.test(cmd)) process.exit(0)
+  const isAntigravity = process.env.AGENT_HOOK_HOST === 'antigravity' || Boolean(input.toolCall)
+  const allow = function () {
+    if (isAntigravity) emit({})
+    process.exit(0)
+  }
 
-  // 命令实际运行目录：Devin exec 的 workdir 参数、命令开头的 `cd <dir> &&`，否则为 hook 的 cwd
-  let dir = String(ti.workdir || ti.cwd || process.cwd())
+  const ti = (input.toolCall && input.toolCall.args) || input.tool_input || {}
+  const cmd = String(ti.CommandLine || ti.command || '')
+  if (!/\bgit\s+(?:-C\s+(?:"[^"]+"|'[^']+'|[^\s;&|]+)\s+)?commit\b/.test(cmd)) allow()
+
+  // 命令实际运行目录：Antigravity run_command 的 Cwd / workspacePaths、Devin exec 的 workdir 参数、命令开头的 `cd <dir> &&` / `git -C <dir>`，否则为 hook 的 cwd
+  let dir = String(
+    ti.Cwd || ti.workdir || ti.cwd || input.cwd ||
+    (Array.isArray(input.workspacePaths) && input.workspacePaths[0]) ||
+    process.cwd()
+  )
   const cd = cmd.match(/^\s*cd\s+("[^"]+"|'[^']+'|[^\s;&|]+)\s*&&/)
   if (cd) dir = path.resolve(dir, cd[1].replace(/^["']|["']$/g, ''))
+  const gitC = cmd.match(/\bgit\s+-C\s+("[^"]+"|'[^']+'|[^\s;&|]+)\s+commit\b/)
+  if (gitC) dir = path.resolve(dir, gitC[1].replace(/^["']|["']$/g, ''))
   // 仅 SDD 项目生效，普通项目完全不碰
-  if (!findSddRoot(dir)) process.exit(0)
+  if (!findSddRoot(dir)) allow()
 
   // 提取提交信息：heredoc 优先（git commit -m "$(cat <<'EOF' ... EOF)"），否则 -m "..." / -m '...'
   let msg = ''
@@ -27,11 +39,16 @@ readStdin(function (input) {
     const m = cmd.match(/-m\s+"((?:[^"\\]|\\.)*)"/) || cmd.match(/-m\s+'([^']*)'/)
     if (m) msg = m[1].replace(/\\"/g, '"').replace(/\\n/g, '\n')
   }
-  if (!msg.trim()) process.exit(0) // 拿不到信息 → 放行，不误拦
+  if (!msg.trim()) allow() // 拿不到信息 → 放行，不误拦
 
   const title = (msg.split('\n').find(function (l) { return l.trim() }) || '').trim()
   const fail = function (why) {
     const reason = '[SDD 提交门] ' + why + '\n规则见 .claude/rules/git-commit.md。改好提交信息再提交。'
+    if (isAntigravity) {
+      // Antigravity 要求退出码为 0 并输出 decision: deny；非 0 会被视为 hook 异常并 fail-open
+      emit({ decision: 'deny', reason: reason })
+      process.exit(0)
+    }
     emit({ decision: 'block', reason: reason })
     console.error(reason)
     process.exit(2)
@@ -55,5 +72,5 @@ readStdin(function (input) {
   if (!/[一-鿿]/.test(desc)) {
     fail('标题描述应为简体中文（type/scope 仍用英文小写）。当前描述：「' + desc + '」')
   }
-  process.exit(0)
+  allow()
 })

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "sdd-skills",
+  "displayName": "SDD Skills",
+  "version": "0.13.0",
+  "description": "规格驱动开发（SDD）技能集：2 个脚手架技能（init / retrofit）、sdd 入口与 sdd-status，外加 16 个 sdd-* 迭代工作流技能，附 MCP 漂移检查工具 sdd_check_drift。",
+  "logo": "assets/sdd-skills.svg",
+  "suggestedPrompts": [
+    "检查当前 SDD 项目的进度与文档漂移状态",
+    "用 SDD 初始化新项目或将现有项目改造成规格驱动治理",
+    "按 SDD 工作流开发新功能或修复缺陷"
+  ],
+  "author": {
+    "name": "wcpe",
+    "url": "https://github.com/wcpe"
+  },
+  "homepage": "https://github.com/wcpe/sdd-skills",
+  "repository": "https://github.com/wcpe/sdd-skills",
+  "keywords": [
+    "sdd",
+    "spec-driven-development",
+    "governance",
+    "skills"
+  ]
+}

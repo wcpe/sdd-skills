@@ -1,14 +1,15 @@
 # SDD Skills
 
-一套「规格驱动开发（SDD, Spec-Driven Development）」的 AI 编码技能集：**2 个脚手架技能** + **16 个 `sdd-*` 迭代技能** + 一套可复用模板。同一套 `SKILL.md` 通用于 **Claude Code**（插件一键装全部）、**OpenAI Codex** 与 **opencode**；Claude Code 下捆绑斜杠命令 / 防漂移护栏 hook / MCP 工具，Codex 下捆绑插件展示元数据 / workflow skill cards / MCP 漂移审计工具。让项目**规格先行、文档即代码、跨会话不漂移**。沉淀自实战项目的治理实践。
+一套「规格驱动开发（SDD, Spec-Driven Development）」的 AI 编码技能集：**2 个脚手架技能** + **16 个 `sdd-*` 迭代技能** + 一套可复用模板。同一套 `SKILL.md` 通用于 **Claude Code**（插件一键装全部）、**OpenAI Codex**、**Devin**、**Antigravity** 与 **opencode**；Claude Code 下捆绑斜杠命令 / 防漂移护栏 hook / MCP 工具，Codex 下捆绑插件展示元数据 / workflow skill cards / MCP 漂移审计工具，Antigravity 下捆绑插件清单 / 全部技能 / MCP 漂移审计工具。让项目**规格先行、文档即代码、跨会话不漂移**。沉淀自实战项目的治理实践。
 
 ## 插件能力
 
-除通用 `skills/` 外，本仓库同时带 Claude Code 与 Codex 的插件入口。Claude Code 通过 `.claude-plugin/plugin.json` 加载斜杠命令、防漂移 hook 与 MCP 工具；Codex 通过 `.codex-plugin/plugin.json` 加载插件展示元数据、workflow skill cards、展示资产与 MCP 工具。两边共用同一套 `SKILL.md` 和同一个 `mcp/sdd-mcp.mjs`，但平台专属能力不混用：Claude 的 `commands/` 与 `hooks/` 不会在 Codex 下启用，Codex 的 `agents/openai.yaml` 与 `skills/*/agents/openai.yaml` 只服务 Codex 展示与默认提示。
+除通用 `skills/` 外，本仓库同时带 Claude Code、Codex、Devin 与 Antigravity 的插件入口。Claude Code 通过 `.claude-plugin/plugin.json` 加载斜杠命令、防漂移 hook 与 MCP 工具；Codex 通过 `.codex-plugin/plugin.json` 加载插件展示元数据、workflow skill cards、展示资产与 MCP 工具；Antigravity 通过 `.antigravity-plugin/plugin.json` 加载全部技能、插件元数据与 `mcp_config.json`。各端共用同一套 `SKILL.md` 和同一个 `mcp/sdd-mcp.mjs`，平台专属能力不混用：Claude 的 `commands/` 与 `hooks/` 不会在 Codex / Antigravity 下启用，Codex 的 `agents/openai.yaml` 与 `skills/*/agents/openai.yaml` 只服务 Codex 展示与默认提示。
 
 - **Claude Code**：`commands/` 提供 `/sdd` 路由、`/sdd-status` 以及所有 workflow 快捷入口；`hooks/` 提供提交门、ADR 不可变提醒、文档同步提醒；`.mcp.json` 暴露 `sdd_check_drift`。
 - **OpenAI Codex**：`.codex-plugin/plugin.json`、`agents/openai.yaml`、`assets/` 和 `skills/*/agents/openai.yaml` 提供插件页、图标、能力说明、workflow skill cards 与默认 prompt；`.mcp.json` 暴露 `sdd_check_drift`。
 - **Devin**：`.devin-plugin/plugin.json` 为清单，加载全部技能（含 `sdd` 入口与 `sdd-status`，替代 Devin 不加载的斜杠命令）、根目录 `hooks.json`（护栏 hook，匹配 Devin 的 `exec` / `edit` / `write` / `apply_patch` 工具名，按 `DEVIN_PLUGIN_ROOT` 定位插件；Devin 按 Claude 兼容顺带读到的 `hooks/hooks.json` 会被启动器自动跳过，护栏不会跑两遍）与 `.mcp.json` 的 `sdd_check_drift`。
+- **Antigravity**：`.antigravity-plugin/plugin.json` 为清单，加载全部 20 个技能（支持 `/sdd`、`/sdd-status` 等斜杠触发）与 `mcp_config.json`（经 `scripts/sdd-mcp-launcher.mjs` 暴露 `sdd_check_drift`）；根目录 `hooks.json` 保留给 Devin 使用，Antigravity 如需启用护栏 hook 可将下方安装节中的配置片段合并到 `~/.gemini/config/hooks.json`。
 - **opencode**：使用通用 `skills/`，不加载 Claude/Codex 插件专属增强。
 
 护栏 hook 一律经 `hooks/run-hook.sh` 启动：hook 进程拿不到交互 shell 的 PATH 时（如 Devin 云端），它按常见安装位置查找 `node`，找不到 `node` 或插件根时静默放行，不会以 exit 127 报错。护栏统一用 stdout JSON 回给宿主（Devin 与 Claude Code 通用）：提交门以 `decision: block` 拦下不合规提交；ADR 提醒经 `additionalContext` 注入代理上下文；文档同步提醒在回合结束时拦一次、让代理补查文档，再次结束即放行。SDD 项目根从命令的 `workdir` / 开头的 `cd` / 被改文件的路径逐级向上找，不依赖会话的启动目录。
@@ -109,6 +110,54 @@ cp -r sdd-skills/skills/* ~/.codex/skills/          # 全局：所有项目可�
 
 在 Devin 的插件设置里从 GitHub 安装 `wcpe/sdd-skills`（个人或组织范围均可），或在 Devin CLI 里 `devin plugins install wcpe/sdd-skills`。技能以 `/sdd-skills:<技能名>` 暴露（如 `/sdd-skills:sdd 加个导出功能`、`/sdd-skills:sdd-status`；Claude 的 `commands/` 斜杠命令在 Devin 下不加载，用这两个技能代替）；hook 与 MCP 随插件生效，改动对新会话生效。更新插件时从 `https://github.com/wcpe/sdd-skills/tree/master` 重装，只填仓库地址可能仍停在旧提交。
 
+### Antigravity
+
+原生插件清单位于 `.antigravity-plugin/plugin.json`，通过 CLI 一键安装后自动加载全部 20 个技能（同级保留 `init-sdd-project/templates/` 模板引用，支持 `/sdd`、`/sdd-status` 等斜杠调用）与 `mcp_config.json`（`sdd_check_drift` MCP 工具），并自动同步到 Antigravity App 与 CLI：
+
+```bash
+agy plugin install https://github.com/wcpe/sdd-skills
+agy plugin list
+```
+
+> **关于护栏 Hook**：根目录 `hooks.json` 保留给 Devin 使用（Devin 顶层事件数组 schema 与 Antigravity 命名组 schema 不兼容）。如需在 Antigravity 会话里启用提交门 / ADR 门 / 文档同步提醒，可将以下片段合并到全局 `~/.gemini/config/hooks.json`（或项目 `.agents/hooks.json`）：
+>
+> ```json
+> {
+>   "sdd-guards": {
+>     "enabled": true,
+>     "PreToolUse": [
+>       {
+>         "matcher": "run_command",
+>         "hooks": [
+>           {
+>             "type": "command",
+>             "command": "sh \"$HOME/.gemini/config/plugins/sdd-skills/hooks/run-hook.sh\" --host antigravity guard-commit.js",
+>             "timeout": 10
+>           }
+>         ]
+>       },
+>       {
+>         "matcher": "write_to_file|replace_file_content|multi_replace_file_content",
+>         "hooks": [
+>           {
+>             "type": "command",
+>             "command": "sh \"$HOME/.gemini/config/plugins/sdd-skills/hooks/run-hook.sh\" --host antigravity guard-adr.js",
+>             "timeout": 10
+>           }
+>         ]
+>       }
+>     ],
+>     "Stop": [
+>       {
+>         "type": "command",
+>         "command": "sh \"$HOME/.gemini/config/plugins/sdd-skills/hooks/run-hook.sh\" --host antigravity nudge-doc-sync.js",
+>         "timeout": 10
+>       }
+>     ]
+>   }
+> }
+> ```
+
 ### opencode
 
 opencode 原生认 `SKILL.md`（并兼容 `.claude/skills/`），靠**目录发现**、没有 skill 安装命令——把技能拷进它扫描的目录即可：
@@ -119,12 +168,15 @@ cp -r sdd-skills/skills/* ~/.config/opencode/skills/   # 全局：所有项目�
 # 或仅当前项目：拷进 <项目>/.opencode/skills/（或 .claude/skills/）
 ```
 
-> Windows 用 `Copy-Item sdd-skills\skills\* <目标> -Recurse`。`skills/init-sdd-project/templates/` 是唯一权威模板源（共用参考在同级的 `references/`），安装时必须让 `init-sdd-project` 与 `retrofit-to-sdd` 保持同级：Claude Code 通过 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/` 定位，Codex 与 opencode 通过 `../init-sdd-project/templates/` 复用同一目录。
+> Windows 用 `Copy-Item sdd-skills\skills\* <目标> -Recurse`。`skills/init-sdd-project/templates/` 是唯一权威模板源（共用参考在同级的 `references/`），安装时必须让 `init-sdd-project` 与 `retrofit-to-sdd` 保持同级：Claude Code 通过 `${CLAUDE_PLUGIN_ROOT}/skills/init-sdd-project/templates/` 定位，Codex、Antigravity 与 opencode 通过 `../init-sdd-project/templates/` 复用同一目录。
 
 ## 仓库结构
 
 ```
 sdd-skills/                         ← 仓库根 = 插件本体（Claude 经 wcpe/claude-plugins，Codex 经 wcpe/codex-plugins）
+├── .antigravity-plugin/            Antigravity 插件清单
+│   └── plugin.json
+├── mcp_config.json                 Antigravity MCP server 注册（使用 ${PLUGIN_ROOT}）
 ├── .claude-plugin/                 Claude Code 插件清单
 │   └── plugin.json
 ├── .devin-plugin/                  Devin 插件清单（hooks 见根目录 hooks.json）
@@ -133,7 +185,7 @@ sdd-skills/                         ← 仓库根 = 插件本体（Claude 经 wc
 ├── .codex-plugin/                  Codex 插件清单
 │   └── plugin.json                 skills 指向 ./skills/，MCP 指向 ./.mcp.json
 ├── agents/                         Codex 插件级展示元数据
-├── assets/                         Codex 插件图标与展示资源
+├── assets/                         插件图标与展示资源（Codex / Antigravity 共用）
 ├── skills/                         所有技能（SKILL.md，三种工具通用；opencode 靠目录发现）
 │   ├── init-sdd-project/
 │   │   ├── SKILL.md
